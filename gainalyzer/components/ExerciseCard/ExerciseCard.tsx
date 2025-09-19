@@ -1,7 +1,7 @@
 import { XIcon } from "lucide-react"
 
 type ExerciseCardProps = {
-    id: string
+    id: string // react ui key
     name: string
     weight: string
     reps: string
@@ -11,13 +11,7 @@ type ExerciseCardProps = {
 }
 
 export function ExerciseCard({
-    id,
-    name,
-    weight,
-    reps,
-    notes,
-    onChange,
-    onDelete,
+    id, name, weight, reps, notes, onChange, onDelete,
 }: ExerciseCardProps) {
 
     // Validation for inputs
@@ -28,9 +22,7 @@ export function ExerciseCard({
         if (inputId === "weight") {
             // Allow digits, optional decimal, and at most one digit after decimal
             const weightRegex = /^\d*(?:\.\d?)?$/;
-            if (weightRegex.test(val)) {
-                onChange(id, "weight", val);
-            }
+            if (weightRegex.test(val)) onChange(id, "weight", val);
         } else if (inputId === "reps") {
             // Only allow whole numbers
             const repsRegex = /^\d*$/;
@@ -109,6 +101,7 @@ export function ExerciseCard({
                             rows={1}
                             value={notes}
                             onChange={(e) => onChange(id, "notes", e.target.value)}
+                            placeholder="notes"
                         />
                     </div>
                 </div>

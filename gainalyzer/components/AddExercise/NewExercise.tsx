@@ -10,7 +10,10 @@ import {
 import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
 
-type ExerciseOption = { id: string; name: string }
+type ExerciseOption = {
+    id: string;
+    name: string
+}
 
 type NewExerciseProps = {
     exercises: ExerciseOption[]

@@ -12,6 +12,23 @@ import { ExerciseCard } from "@/components/ExerciseCard/ExerciseCard";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 
+
+// Exercise in user library (DB)
+type DbExercise = {
+    id: string  // UUID from DB
+    name: string
+}
+
+// Exercise in log (UI only)
+type LogExercise = {
+    id: string        // React unique key (string)
+    exercise_id: string // real exercise UUID from DbExercise
+    name: string
+    weight: string
+    reps: string
+    notes: string
+}
+
 export default function LogPage() {
 
     const supabase = createClient();
@@ -21,118 +38,23 @@ export default function LogPage() {
     const { weight, setWeight, calories, setCalories } = useLogInputs();
     const [weightMetric, setWeightMetric] = useState("lbs");
 
-
     // --- Exercises created in the user's library ---
-    const [dbExercises, setDbExercises] = useState<{ id: string, name: string }[]>([]);
+    const [dbExercises, setDbExercises] = useState<DbExercise[]>([]);
 
     // --- Exercises added to this log ---
-    const [exercises, setExercises] = useState<
-        {
-            id: string;           // our own identifier (string)
-            exercise_id: string;  // UUID from exercises table
-            name: string;
-            weight: string;
-            reps: string;
-            notes: string;
-        }[]
-    >([]);
+    const [exercises, setExercises] = useState<LogExercise[]>([]);
 
 
     async function fetchExercisesFromDb() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            alert("Not signed in");
-            return;
-        }
-
-        const { data, error } = await supabase
-            .from("exercises")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at");
-
-        if (error) {
-            console.error(error);
-        } else {
-            console.log("Fetched:", data);
-            setDbExercises(data ?? []);
-        }
+        return
     }
 
     useEffect(() => {
         fetchExercisesFromDb();
     }, []);
 
-    // Types for Supabase response
-    type SupabaseExercise = {
-        id: string
-        name: string
-    }
-
-    type SupabaseLogExercise = {
-        id: string
-        exercise_id: string
-        notes: string | null
-        exercises: SupabaseExercise   // This is an object, not array
-    }
-
-    type SupabaseLog = {
-        id: string
-        bodyweight: number | null
-        calories: number | null
-        log_exercises: SupabaseLogExercise[]
-    }
-
     async function fetchLogForDate(selectedDate: Date) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const logDate = selectedDate.toISOString().split("T")[0]
-
-        const { data: log, error } = await supabase
-            .from<SupabaseLog>("logs")
-            .select(`
-      id,
-      bodyweight,
-      calories,
-      log_exercises (
-        id,
-        exercise_id,
-        notes,
-        exercises!inner(id, name)
-      )
-    `)
-            .eq("user_id", user.id)
-            .eq("log_date", logDate)
-            .single()
-
-        if (error && error.code !== "PGRST116") {
-            console.error(error)
-            return
-        }
-
-        if (log) {
-            setWeight(log.bodyweight?.toString() ?? "")
-            setCalories(log.calories?.toString() ?? "")
-
-            setExercises(
-                log.log_exercises.map((le) => {
-                    const exercise = le.exercises // now TypeScript knows this is an object
-                    return {
-                        id: `${le.id}-${Date.now()}-${Math.random()}`, // UI-only key
-                        exercise_id: exercise.id,                       // actual UUID
-                        name: exercise.name,
-                        weight: "",
-                        reps: "",
-                        notes: le.notes || ""
-                    }
-                })
-            )
-        } else {
-            setWeight("")
-            setCalories("")
-            setExercises([])
-        }
+        return
     }
 
     // Refetch log whenever the date changes
@@ -173,62 +95,7 @@ export default function LogPage() {
 
     // --- Save log to DB ---
     async function handleSaveLog() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || !date) return;
-
-        const logDate = date.toISOString().split("T")[0];
-
-        // 1️⃣ Upsert log
-        const { data: logData, error: logError } = await supabase
-            .from("logs")
-            .upsert(
-                {
-                    user_id: user.id,
-                    log_date: logDate,
-                    bodyweight: weight || null,
-                    calories: calories || null,
-                },
-                { onConflict: "user_id,log_date" }
-            )
-            .select()
-            .single();
-
-        if (logError) {
-            console.error("Error saving log:", logError);
-            return;
-        }
-
-        // 2️⃣ Delete old log_exercises
-        const { error: deleteError } = await supabase
-            .from("log_exercises")
-            .delete()
-            .eq("log_id", logData.id);
-
-        if (deleteError) {
-            console.error("Error deleting old log_exercises:", deleteError);
-            return;
-        }
-
-        // 3️⃣ Insert new log_exercises
-        if (exercises.length > 0) {
-            const { error: insertError } = await supabase
-                .from("log_exercises")
-                .insert(
-                    exercises.map((ex) => ({
-                        log_id: logData.id,
-                        exercise_id: ex.exercise_id, // use exercise_id instead of id
-                        // exercise_id: ex.id,
-                        notes: ex.notes || null
-                    }))
-                );
-
-            if (insertError) {
-                console.error("Error inserting log_exercises:", insertError);
-                return;
-            }
-        }
-
-        toast.success("Log saved successfully!");
+        return
     }
 
     // --- Date Navigation ---
@@ -378,8 +245,8 @@ export default function LogPage() {
                         <div className="flex flex-wrap justify-center gap-4">
                             {exercises.map((exercise) => (
                                 <ExerciseCard
-                                    key={exercise.id}          // ✅ React key - use unique id from DB
-                                    id={exercise.id}           // ✅ pass down as prop to ExerciseCard
+                                    key={exercise.id}          // ✅ React only key - use unique id from DB
+                                    id={exercise.id}           // ✅ pass down as prop for ExerciseCard logic
                                     name={exercise.name}
                                     weight={exercise.weight}
                                     reps={exercise.reps}
