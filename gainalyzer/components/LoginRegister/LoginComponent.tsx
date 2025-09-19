@@ -1,0 +1,175 @@
+'use client'
+import { signInWithGoogle, loginWithEmailPassword } from '@/app/login/actions'
+import { createClient } from '@/utils/supabase/client'
+import gainalyzerLogo from '@/public/gainalyzerlogo.png'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import React, { useState, useEffect } from 'react'
+
+const LoginComponent = () => {
+    const router = useRouter()
+    const [isSubmitDisabled, setIsSubmitdisabled] = useState<boolean>(true)
+    const [emailError, setEmailError] = useState<string>('')
+    const [passwordError, setPasswordError] = useState<string>('')
+    const [loginError, setLoginError] = useState<string>('')
+
+    interface registerInfo {
+        email: string,
+        password: string
+    }
+
+    const [inputs, setInputs] = useState<registerInfo>({
+        email: '',
+        password: ''
+    });
+
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const email: string = e.target.value
+        setInputs((prevInputs) => ({ ...prevInputs, email: email }))
+    }
+
+    // Debounced email validation
+    useEffect(() => {
+        const validateEmail = (email: string) => {
+            const emailRegEx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+            return emailRegEx.test(email)
+        }
+
+        const email = inputs.email
+        if (email == '') {
+            setEmailError('')
+            return
+        }
+
+        // wait 300ms before updating in case we keep typing
+        const timeout = setTimeout(() => {
+            if (!validateEmail(email)) {
+                setEmailError('Enter a valid email address.')
+            } else {
+                setEmailError('')
+            }
+        }, 300)
+
+        // useEffect clean up function
+        // If inputs.email is updated again before 300ms clear this timeout
+        return () => clearTimeout(timeout)
+    }, [inputs.email])
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputs((prevInputs) => ({ ...prevInputs, password: e.target.value }))
+    }
+
+    // Debounced password validation
+    useEffect(() => {
+        const password = inputs.password
+        if (password === '') {
+            setPasswordError('')
+            return
+        }
+
+        // wait 300ms before updating in case we keep typing
+        const timeout = setTimeout(() => {
+            if (password.length >= 6) {
+                setPasswordError('')
+            } else {
+                setPasswordError('Enter a password at least 6 characters long.')
+            }
+
+            return () => clearTimeout(timeout)
+        }, 300)
+
+        // useEffect clean up function
+        // If inputs.password is updated again before 300ms clear this timeout
+        return () => clearTimeout(timeout)
+
+    }, [inputs.password])
+
+    // ensure all inputs are filled in and valid to enable the submit button
+    useEffect(() => {
+        const inputsFilled: boolean = (inputs.email !== '' && inputs.password !== '')
+        if (!inputsFilled || emailError !== '' || passwordError !== '') {
+            setIsSubmitdisabled(true)
+        } else {
+            setIsSubmitdisabled(false)
+        }
+    }, [inputs.email, inputs.password, emailError, passwordError])
+
+
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        const result = await loginWithEmailPassword(formData)
+
+        if (result?.error) {
+            setLoginError(result.error)
+        } else if (result?.redirect) {
+            router.push(result.redirect)
+            // window.location.href = result.redirect
+        }
+    }
+
+    return (
+
+        <div className='flex flex-col items-center justify-center h-screen gap-4'>
+            <div className="[@media(min-width:460px)]:border [@media(min-width:460px)]:border-[#333333] rounded pl-10 pr-10 pb-10 w-90 mx-auto ">
+                <div className="relative pt-15 pb-15 w-full max-w-md mx-auto aspect-[822/148]">
+                    <Image
+                        src={gainalyzerLogo}
+                        alt="gainalyzer logo"
+                        fill
+                        style={{ objectFit: 'contain' }}
+                        sizes="(max-width: 768px) 100vw, 
+                    (max-width: 1024px) 50vw, 
+                    33vw"
+                    />
+                </div>
+
+                <div className='login'>
+                    < form className="flex flex-col" onSubmit={handleSubmit}>
+                        <label
+                            className='login-register-input input-bordered flex flex-col items-center gap-2 '>
+                            <input type='email'
+                                onChange={handleEmailChange} className={`grow ${emailError ? 'border-red-400' : 'border-[#333]'}`} placeholder='Email' value={inputs.email} name='email' required maxLength={254} />
+                            <>{emailError && <div className='text-red-400'>{emailError}</div>}</>
+                        </label>
+
+                        <label className='login-register-input input-bordered flex flex-col items-center gap-2'>
+                            <input type='password' onChange={handlePasswordChange} className={`grow border-[#333] ${passwordError ? 'border-red-400' : 'border-[#333]'}`} placeholder='Password' value={inputs.password} name='password' required maxLength={128} />
+                            <>{passwordError && <div className='text-red-400'>{passwordError}</div>}</>
+                        </label>
+
+                        <button type='submit' className='button mt-3' disabled={isSubmitDisabled}>Log In</button>
+
+                        <div className='flex items-center justify-center m-3'>
+                            <p>OR</p>
+                        </div>
+
+                        <button type='button' className='button' onClick={signInWithGoogle}>Log in with Google</button>
+
+                        <>
+                            {loginError &&
+                                <div className='text-red-400 text-center mt-5'>
+                                    {loginError}
+                                </div>
+                            }
+                        </>
+
+                        <div className='flex flex-row justify-center mt-3'>
+                            <Link href="/account/reset-password/request-email" className="hover:underline">
+                                Forgot password?
+                            </Link>
+                        </div>
+                    </form >
+
+                    <div className='flex flex-row justify-center mt-5'>
+                        <p>Don&apos;t have an account? <span className='SignupLink text-blue-400 cursor-pointer'><Link href='/register'>Sign up</Link></span></p>
+                    </div>
+                </div >
+            </div>
+        </div>
+    )
+}
+
+export default LoginComponent
