@@ -131,8 +131,18 @@ quickly change date without needing to open the date picker.
 * Had to refactor exercise ids not matching up from react components to supabase
 * need to fix RLS for the other log tables
 
+## 9-19:
+* Setup RLS policies for the rest of the tables
+* Had to refactor exercise id stuff to get handleSaveLog to work properly.
+* Added weight/rep cols to log_exercises. Don't need log_sets anymore. Each exercise
+should only have one set.
+* Kind of understand how the table relationships work
+
 ### todo:
+* When trying to add a duplicate exercise card, show an error toast
 * Have ai explain how the tables relate and what the exercise id's are in log/page
+* Setup some cache for date logs so we don't have to keep fetching from db every time
+and delete the cache after some time.
 * Maybe make the exercise section long and just blank, saying "no exercises" until adding some
 so that the screen doesn't look so empty?
 * The log's save button should be disabled until changes are made.

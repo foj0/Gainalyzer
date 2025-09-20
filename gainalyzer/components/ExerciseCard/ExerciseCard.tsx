@@ -1,12 +1,13 @@
 import { XIcon } from "lucide-react"
 
 type ExerciseCardProps = {
-    id: string // react ui key
+    id: string // log_exercise id (UI key)
     name: string
     weight: string
     reps: string
     notes: string
-    onChange: (id: string, field: string, value: string) => void
+    // onChange: (id: string, field: string, value: string) => void
+    onChange: (id: string, field: keyof Omit<LogExercise, 'id' | 'exercise_id' | 'name'>, value: string) => void
     onDelete: (id: string) => void
 }
 

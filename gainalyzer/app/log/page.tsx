@@ -21,12 +21,12 @@ type DbExercise = {
 
 // Exercise in log (UI only)
 type LogExercise = {
-    id: string        // React unique key (string)
-    exercise_id: string // real exercise UUID from DbExercise
+    id: string        // log_exercises.id - unique per log entry
+    exercise_id: string // real exercise UUID
     name: string
-    weight: string
-    reps: string
-    notes: string
+    weight: string      // maps to log_exercises.weight
+    reps: string        // maps to log_exercises.reps
+    notes: string       // maps to log_exercises.notes
 }
 
 export default function LogPage() {
@@ -54,7 +54,60 @@ export default function LogPage() {
     }, []);
 
     async function fetchLogForDate(selectedDate: Date) {
-        return
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const logDate = selectedDate.toISOString().split("T")[0];
+
+        const { data: log, error } = await supabase
+            .from("logs")
+            .select(`
+            id,
+            bodyweight,
+            calories,
+            log_exercises (
+                id,
+                exercise_id,
+                weight,
+                reps,
+                notes,
+                exercises!inner(id, name)
+            )
+        `)
+            .eq("user_id", user.id)
+            .eq("log_date", logDate)
+            .single();
+
+        if (error && error.code !== "PGRST116") { // 116 = no rows found
+            console.error("Error fetching log:", error);
+            return;
+        }
+
+        if (log) {
+            // Populate weight and calories
+            setWeight(log.bodyweight?.toString() ?? "");
+            setCalories(log.calories?.toString() ?? "");
+
+            // Map exercises from log_exercises
+            setExercises(
+                log.log_exercises.map((le: any) => {
+                    const exercise = le.exercises; // should be a single object
+                    return {
+                        id: le.id,             // use log_exercises id as UI key
+                        exercise_id: exercise.id, // UUID from exercises table
+                        name: exercise.name,
+                        weight: le.weight?.toString() ?? "",
+                        reps: le.reps?.toString() ?? "",
+                        notes: le.notes || ""
+                    } as LogExercise;
+                })
+            );
+        } else {
+            // Reset fields if no log
+            setWeight("");
+            setCalories("");
+            setExercises([]);
+        }
     }
 
     // Refetch log whenever the date changes
@@ -95,7 +148,59 @@ export default function LogPage() {
 
     // --- Save log to DB ---
     async function handleSaveLog() {
-        return
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || !date) return;
+
+        const logDate = date.toISOString().split("T")[0];
+
+        try {
+            // 1️⃣ Upsert the main log row (user_id + log_date)
+            const { data: logData, error: logError } = await supabase
+                .from("logs")
+                .upsert(
+                    {
+                        user_id: user.id,
+                        log_date: logDate,
+                        bodyweight: weight || null,
+                        calories: calories || null,
+                    },
+                    { onConflict: "user_id, log_date" } // conflict target
+                )
+                .select()
+                .single();
+
+            if (logError) throw logError;
+
+            // 2️⃣ Remove old log_exercises for this log
+            const { error: deleteError } = await supabase
+                .from("log_exercises")
+                .delete()
+                .eq("log_id", logData.id);
+
+            if (deleteError) throw deleteError;
+
+            // 3️⃣ Insert current exercises for this log
+            if (exercises.length > 0) {
+                const { error: insertError } = await supabase
+                    .from("log_exercises")
+                    .insert(
+                        exercises.map((ex) => ({
+                            log_id: logData.id,
+                            exercise_id: ex.exercise_id, // ✅ DB UUID
+                            weight: ex.weight ? parseFloat(ex.weight) : null,
+                            reps: ex.reps ? parseInt(ex.reps) : null,
+                            notes: ex.notes || null,
+                        }))
+                    );
+
+                if (insertError) throw insertError;
+            }
+
+            toast.success("Log saved successfully!");
+        } catch (err) {
+            console.error("Error saving log:", err);
+            toast.error("Failed to save log.");
+        }
     }
 
     // --- Date Navigation ---
