@@ -119,7 +119,10 @@ export default function LogPage() {
     // --- Adding an exercise ---
     function handleAddExercise(exercise: { id: string; name: string }) {
         // Prevent duplicates in current log
-        if (exercises.some((ex) => ex.exercise_id === exercise.id)) return;
+        if (exercises.some((ex) => ex.exercise_id === exercise.id)) {
+            toast.warning("Cannot add duplicate exercises.")
+            return;
+        }
 
         setExercises((prev) => [
             ...prev,
@@ -340,33 +343,40 @@ export default function LogPage() {
 
                     {/* Exercise Section */}
                     {/* Exercises List */}
-                    <div className="log-section p-2">
-
-                        {/* Show exercises label once exercises have been added */}
-                        {exercises.length > 0 && (
-                            <div className="flex justify-center text-xl mb-4">Exercises</div>
+                    <div className="log-section relative p-2 min-h-[60vh] flex flex-col">
+                        <div className="flex justify-center text-xl mb-4">Exercises</div>
+                        {exercises.length > 0 ? (
+                            <>
+                                <div className="flex flex-wrap justify-center gap-4 mb-15">
+                                    {exercises.map((exercise) => (
+                                        <ExerciseCard
+                                            key={exercise.id}
+                                            id={exercise.id}
+                                            name={exercise.name}
+                                            weight={exercise.weight}
+                                            reps={exercise.reps}
+                                            notes={exercise.notes}
+                                            onChange={handleExerciseChange}
+                                            onDelete={handleExerciseDelete}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <p className="flex flex-1 text-center items-center justify-center whitespace-pre-wrap">
+                                No exercises.
+                                <br />
+                                Click the button below
+                                <br />
+                                to add some.
+                            </p>
                         )}
-
-                        <div className="flex flex-wrap justify-center gap-4">
-                            {exercises.map((exercise) => (
-                                <ExerciseCard
-                                    key={exercise.id}          // ✅ React only key - use unique id from DB
-                                    id={exercise.id}           // ✅ pass down as prop for ExerciseCard logic
-                                    name={exercise.name}
-                                    weight={exercise.weight}
-                                    reps={exercise.reps}
-                                    notes={exercise.notes}
-                                    onChange={handleExerciseChange}
-                                    onDelete={handleExerciseDelete}
-                                />
-                            ))}
-                        </div>
-
                         {/* Add Exercise Button */}
-                        <div className={`${exercises.length > 0 ? "mt-8" : ""}`}>
+                        <div className={`absolute left-0 right-0 bottom-0 mb-2 ${exercises.length > 0 ? "mt-8" : ""}`}>
                             <AddExercise onAdd={handleAddExercise} />
                         </div>
                     </div>
+
 
                     {/* Form submit save button */}
                     <div className="flex justify-center">

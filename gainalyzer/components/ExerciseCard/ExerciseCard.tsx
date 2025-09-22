@@ -1,5 +1,15 @@
 import { XIcon } from "lucide-react"
 
+// Exercise in log (UI only)
+type LogExercise = {
+    id: string        // log_exercises.id - unique per log entry
+    exercise_id: string // real exercise UUID
+    name: string
+    weight: string      // maps to log_exercises.weight
+    reps: string        // maps to log_exercises.reps
+    notes: string       // maps to log_exercises.notes
+}
+
 type ExerciseCardProps = {
     id: string // log_exercise id (UI key)
     name: string
