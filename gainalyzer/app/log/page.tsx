@@ -189,7 +189,7 @@ export default function LogPage() {
                     .insert(
                         exercises.map((ex) => ({
                             log_id: logData.id,
-                            exercise_id: ex.exercise_id, // ✅ DB UUID
+                            exercise_id: ex.exercise_id, // DB UUID
                             weight: ex.weight ? parseFloat(ex.weight) : null,
                             reps: ex.reps ? parseInt(ex.reps) : null,
                             notes: ex.notes || null,
@@ -271,7 +271,7 @@ export default function LogPage() {
                         <div className="flex items-center">
                             <button id="previous" className="date-button" onClick={handleDateArrowClick}>
                                 <ChevronLeftIcon size={20}></ChevronLeftIcon>
-                                <span>Previous</span>
+                                <span>Prev</span>
                             </button>
                             <div className="sm:pl-4 sm:pr-4">
 
@@ -343,15 +343,15 @@ export default function LogPage() {
 
                     {/* Exercise Section */}
                     {/* Exercises List */}
-                    <div className="log-section relative p-2 min-h-[60vh] flex flex-col">
+                    <div className="log-section relative p-2 min-h-[35vh] sm:min-h-[60vh] flex flex-col">
                         <div className="flex justify-center text-xl mb-4">Exercises</div>
                         {exercises.length > 0 ? (
                             <>
                                 <div className="flex flex-wrap justify-center gap-4 mb-15">
                                     {exercises.map((exercise) => (
                                         <ExerciseCard
-                                            key={exercise.id}
-                                            id={exercise.id}
+                                            key={exercise.id} // React only key - use unique id from DB 
+                                            id={exercise.id} // pass down as prop for ExerciseCard logic
                                             name={exercise.name}
                                             weight={exercise.weight}
                                             reps={exercise.reps}
@@ -363,7 +363,7 @@ export default function LogPage() {
                                 </div>
                             </>
                         ) : (
-                            <p className="flex flex-1 text-center items-center justify-center whitespace-pre-wrap">
+                            <p className="text-[#8e8e8e] flex flex-1 text-center items-center justify-center whitespace-pre-wrap">
                                 No exercises.
                                 <br />
                                 Click the button below

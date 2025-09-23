@@ -17,6 +17,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 type ExerciseOption = { id: string; name: string }
@@ -43,6 +44,7 @@ export function ExerciseCombobox({ exercises, setExercises, value, onChange }: E
                 .select("*")
                 .eq("user_id", user.id)
                 .order("created_at", { ascending: true });
+            //TODO: change to alphabetical ordering
 
             if (error) {
                 console.error(error)
@@ -59,7 +61,7 @@ export function ExerciseCombobox({ exercises, setExercises, value, onChange }: E
 
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal={true}>
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"

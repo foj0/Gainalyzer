@@ -40,10 +40,9 @@ export default async function Dashboard() {
                         Add Log
                     </Link>
                 </button>
-                <p className="mt-4">Your dashboard will go here. Make a dashboard
-                    component and insert here for ease.</p>
+                <p className="mt-4">Dashboard will go here.</p>
                 <br></br>
-                <div className="h-[2000px] mt-6">Scroll me!</div>
+                <div className="h-[2000px] mt-6">Scroll me</div>
             </main >
 
 

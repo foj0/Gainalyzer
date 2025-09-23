@@ -271,7 +271,7 @@ input {
     /* color: var(--input-name-color); */
 }
 
-login-register-input {
+.login-register-input {
     width: 100%;
     /* border: var(--custom-border); */
     border-width: 1px;
@@ -279,7 +279,7 @@ login-register-input {
     border-radius: 5px;
     padding: 8px;
     font-size: 0.9rem;
-    border-color: --blue;
+    /* border-color: --blue; */
     /* background-color: var(--custom-bg-color); */
     /* color: var(--input-name-color); */
 }

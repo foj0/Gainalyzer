@@ -127,16 +127,16 @@ const LoginComponent = () => {
                 </div>
 
                 <div className='login'>
-                    < form className="flex flex-col" onSubmit={handleSubmit}>
+                    <form className="flex flex-col" onSubmit={handleSubmit}>
                         <label
-                            className='login-register-input input-bordered flex flex-col items-center gap-2 '>
+                            className='flex flex-col items-center gap-2 '>
                             <input type='email'
-                                onChange={handleEmailChange} className={`grow ${emailError ? 'border-red-400' : 'border-[#333]'}`} placeholder='Email' value={inputs.email} name='email' required maxLength={254} />
+                                onChange={handleEmailChange} className={`login-register-input grow ${emailError ? 'border-red-400' : 'border-[#333]'}`} placeholder='Email' value={inputs.email} name='email' required maxLength={254} />
                             <>{emailError && <div className='text-red-400'>{emailError}</div>}</>
                         </label>
 
-                        <label className='login-register-input input-bordered flex flex-col items-center gap-2'>
-                            <input type='password' onChange={handlePasswordChange} className={`grow border-[#333] ${passwordError ? 'border-red-400' : 'border-[#333]'}`} placeholder='Password' value={inputs.password} name='password' required maxLength={128} />
+                        <label className='flex flex-col items-center gap-2'>
+                            <input type='password' onChange={handlePasswordChange} className={`login-register-input grow border-[#333] ${passwordError ? 'border-red-400' : 'border-[#333]'}`} placeholder='Password' value={inputs.password} name='password' required maxLength={128} />
                             <>{passwordError && <div className='text-red-400'>{passwordError}</div>}</>
                         </label>
 
