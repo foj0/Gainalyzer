@@ -12,6 +12,8 @@ import { ExerciseCard } from "@/components/ExerciseCard/ExerciseCard";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 
+// create client once at module scope
+const supabase = createClient();
 
 // Exercise in user library (DB)
 type DbExercise = {
@@ -31,7 +33,7 @@ type LogExercise = {
 
 export default function LogPage() {
 
-    const supabase = createClient();
+    const [user, setUser] = useState<any>(null);
 
     // --- Date and user input ---
     const [date, setDate] = useState<Date | undefined>(new Date());
@@ -44,17 +46,16 @@ export default function LogPage() {
     // --- Exercises added to this log ---
     const [exercises, setExercises] = useState<LogExercise[]>([]);
 
-
-    async function fetchExercisesFromDb() {
-        return
-    }
-
+    // fetch user once on mount
     useEffect(() => {
-        fetchExercisesFromDb();
+        async function loadUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        }
+        loadUser();
     }, []);
 
     async function fetchLogForDate(selectedDate: Date) {
-        const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
         const logDate = selectedDate.toISOString().split("T")[0];
@@ -110,48 +111,13 @@ export default function LogPage() {
         }
     }
 
-    // Refetch log whenever the date changes
+    // Refetch log whenever the date changes and user is loaded
     useEffect(() => {
-        if (date) fetchLogForDate(date);
-    }, [date]);
-
-
-    // --- Adding an exercise ---
-    function handleAddExercise(exercise: { id: string; name: string }) {
-        // Prevent duplicates in current log
-        if (exercises.some((ex) => ex.exercise_id === exercise.id)) {
-            toast.warning("Cannot add duplicate exercises.")
-            return;
-        }
-
-        setExercises((prev) => [
-            ...prev,
-            {
-                id: `${Date.now()}-${Math.random()}`, // unique id
-                exercise_id: exercise.id,
-                name: exercise.name,
-                weight: "",
-                reps: "",
-                notes: "",
-            },
-        ]);
-    }
-
-    // --- Updating an exercise field ---
-    function handleExerciseChange(id: string, field: string, value: string) {
-        setExercises((prev) =>
-            prev.map((ex) => (ex.id === id ? { ...ex, [field]: value } : ex))
-        );
-    }
-
-    // --- Deleting an exercise ---
-    function handleExerciseDelete(id: string) {
-        setExercises((prev) => prev.filter((ex) => ex.id !== id));
-    }
+        if (date && user) fetchLogForDate(date);
+    }, [date, user]);
 
     // --- Save log to DB ---
     async function handleSaveLog() {
-        const { data: { user } } = await supabase.auth.getUser();
         if (!user || !date) return;
 
         const logDate = date.toISOString().split("T")[0];
@@ -205,6 +171,41 @@ export default function LogPage() {
             toast.error("Failed to save log.");
         }
     }
+
+
+    // --- Adding an exercise ---
+    function handleAddExercise(exercise: { id: string; name: string }) {
+        // Prevent duplicates in current log
+        if (exercises.some((ex) => ex.exercise_id === exercise.id)) {
+            toast.warning("Cannot add duplicate exercises.")
+            return;
+        }
+
+        setExercises((prev) => [
+            ...prev,
+            {
+                id: `${Date.now()}-${Math.random()}`, // unique id
+                exercise_id: exercise.id,
+                name: exercise.name,
+                weight: "",
+                reps: "",
+                notes: "",
+            },
+        ]);
+    }
+
+    // --- Updating an exercise field ---
+    function handleExerciseChange(id: string, field: string, value: string) {
+        setExercises((prev) =>
+            prev.map((ex) => (ex.id === id ? { ...ex, [field]: value } : ex))
+        );
+    }
+
+    // --- Deleting an exercise ---
+    function handleExerciseDelete(id: string) {
+        setExercises((prev) => prev.filter((ex) => ex.id !== id));
+    }
+
 
     // --- Date Navigation ---
     function handleDateArrowClick(event: React.MouseEvent<HTMLButtonElement>) {

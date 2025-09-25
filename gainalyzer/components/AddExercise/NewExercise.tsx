@@ -18,9 +18,10 @@ type ExerciseOption = {
 type NewExerciseProps = {
     exercises: ExerciseOption[]
     setExercises: React.Dispatch<React.SetStateAction<ExerciseOption[]>>
+    setRefreshKey: React.Dispatch<React.SetStateAction<number>>
 }
 
-export const NewExercise = ({ exercises, setExercises }: NewExerciseProps) => {
+export const NewExercise = ({ exercises, setExercises, setRefreshKey }: NewExerciseProps) => {
     const supabase = createClient();
     const [open, setOpen] = useState(false)
     const [exerciseName, setExerciseName] = useState("")
@@ -59,6 +60,7 @@ export const NewExercise = ({ exercises, setExercises }: NewExerciseProps) => {
                 { id: data.id, name: data.name }
             ])
             toast.success(`Exercise "${data.name}" created.`)
+            setRefreshKey(prev => prev + 1)
         }
 
         setExerciseName("")

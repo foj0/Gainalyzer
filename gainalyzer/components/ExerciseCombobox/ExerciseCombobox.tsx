@@ -3,7 +3,6 @@ import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/utils/supabase/client"
 import {
     Command,
     CommandEmpty,
@@ -17,7 +16,6 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 type ExerciseOption = { id: string; name: string }
@@ -31,34 +29,6 @@ type ExerciseComboboxProps = {
 
 export function ExerciseCombobox({ exercises, setExercises, value, onChange }: ExerciseComboboxProps) {
     const [open, setOpen] = useState(false)
-    const supabase = createClient();
-
-    // fetch user exercises
-    useEffect(() => {
-        async function fetchExercises() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-
-            const { data, error } = await supabase
-                .from("exercises")
-                .select("*")
-                .eq("user_id", user.id)
-                .order("created_at", { ascending: true });
-            //TODO: change to alphabetical ordering
-
-            if (error) {
-                console.error(error)
-            } else if (data) {
-                setExercises((data as any).map((ex: any) => ({
-                    id: ex.id,
-                    name: ex.name
-                })))
-            }
-        }
-
-        fetchExercises();
-    }, [setExercises, supabase]);
-
 
     return (
         <Popover open={open} onOpenChange={setOpen} modal={true}>

@@ -7,15 +7,19 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { LuCirclePlus } from "react-icons/lu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ExerciseCombobox } from "@/components/ExerciseCombobox/ExerciseCombobox";
 import { NewExercise } from "./NewExercise";
+import { createClient } from "@/utils/supabase/client"
+
+const supabase = createClient();
 
 type ExerciseOption = { id: string; name: string }
 
 export const AddExercise = ({ onAdd }: { onAdd: (exercise: ExerciseOption) => void }) => {
     const [exercises, setExercises] = useState<ExerciseOption[]>([])
     const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null)
+    const [refreshKey, setRefreshKey] = useState(0); // updated when we add an exercise in NewExercise to trigger a refetch
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault()
@@ -30,6 +34,31 @@ export const AddExercise = ({ onAdd }: { onAdd: (exercise: ExerciseOption) => vo
 
         console.log("Adding exercise:", exercise)
     }
+
+    // fetch user exercises
+    useEffect(() => {
+        async function fetchExercises() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data, error } = await supabase
+                .from("exercises")
+                .select("*")
+                .eq("user_id", user.id)
+                .order("name", { ascending: true });
+
+            if (error) {
+                console.error(error)
+            } else if (data) {
+                setExercises((data as any).map((ex: any) => ({
+                    id: ex.id,
+                    name: ex.name
+                })))
+            }
+        }
+
+        fetchExercises();
+    }, [refreshKey]);
 
     return (
         <div>
@@ -53,7 +82,8 @@ export const AddExercise = ({ onAdd }: { onAdd: (exercise: ExerciseOption) => vo
                     <div className="flex flex-col gap-2">
 
                         {/* Create New Exercise Dialog */}
-                        <NewExercise exercises={exercises} setExercises={setExercises} />
+                        <NewExercise exercises={exercises} setExercises={setExercises} setRefreshKey={setRefreshKey}
+                        />
 
                         <form onSubmit={handleAdd} className="flex flex-col">
                             <ExerciseCombobox

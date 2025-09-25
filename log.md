@@ -138,21 +138,41 @@ quickly change date without needing to open the date picker.
 should only have one set.
 * Kind of understand how the table relationships work
 
+## 9-22:
+* Edited log layout a little to make it look less empty. Responsive sizing.
+* Fixed exercise combobox not scrolling; set popover modal={true}
+* Fixed login/register inputs again... finally done for good now. I hope. Got their own class.
+* Added index for exercises that references user id
+* Added composite index for log_exercises on log_date and user_id
+* Added index for log_exercises on exercise_id. Might not be used. Remove later if not needed
+* Handled all 5 Performance Advisor suggestions for indexs
+* Fixed supabase performance warnings:
+    Calling auth.uid() (or current_setting()) directly inside a policy can cause it to be re-evaluated per-row, harming performance at scale.
+    Supabase recommends wrapping such calls in a scalar subquery form (SELECT auth.uid()) so the function is evaluated once per statement, not per row.
+
+## 9-23:
+* Moved the exercises fetch from ExerciseCombobox to AddExercises, so no delay in loading them in dropdown list.
+* Order exercises by name alphabetically in add exercise combobox
+* Looked into different chart libraries and decided in ReCharts
+* Fixed bug causing infinite supabase requests in AddExercise, fixed by using refreshKey instead of exercises in fetch dependency list.
+
+## 9-24:
+* Took time to better understand how the supabase postgres api works and making database calls myself.
+* Spent hrs trying to figure out how to correctly type the supabase responses and how to filter and preprocess them.
+to avoid any typescript errors or complaints.
+
 ### todo:
-* When trying to add a duplicate exercise card, show an error toast
-* Have ai explain how the tables relate and what the exercise id's are in log/page
+* Start on Dashboard. Get a graph up for the bodyweight or something
+    - app/dashboard/page should be server component, insert a separate client dashboard component within it.
+    - Should I do similar thing to make loading pages faster? idk
+    - try to figure out how to fetch logs myself
+* Might need to edit the FetchLogForDate function to use log_id and not log_date
+* In the calendar picker highlight days with filled in logs?
 * Setup some cache for date logs so we don't have to keep fetching from db every time
-and delete the cache after some time.
-* Maybe make the exercise section long and just blank, saying "no exercises" until adding some
-so that the screen doesn't look so empty?
-* The log's save button should be disabled until changes are made.
-* Setup supabase tables for log stuff
-* Setup RLS for the tables. Like allowing user id to edit their own logs
-* Test and ensure adding exercises works first
-* Edit the log input hooks to store the date also, so that we're not loading the same
-data for every day? Also make the user data once loaded override the localstorage??
-Idk that'll come more into play once I get that working.
-* Thinking about it more, I don't think we really need to store unsaved log inputs
-for refreshes. Just save it before refreshing bro. And if you forget, well type it in again.
+and delete the cache after some time. Or does supabase already do this?
+* Look into why logout takes so long. Maybe just redirect to login page first while it loads the logout
+* Consider disabling the log button until changes are made.
 * add a little profile marker with pfp and email/full name at bottom by settings on sidebar
-* Do I need to have a allow cookies thing?
+* Do I need to have a allow cookies thing? Look into when this is needed.
+* For the log page, look into reducing the number of auth reqs. Is there a way to
+do it once and keep that for the rest of the session?
