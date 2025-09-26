@@ -540,6 +540,23 @@ input[disabled] {
     background-color: var(--exercise-card-input)
 }
 
+.dashboard-section-1 {
+    background-color: var(--dashboard-section-primary);
+    border-radius: 4px;
+    border-color: var(--border);
+    border-width: 1px;
+}
+
+.dashboard-section-2 {
+    background-color: var(--dashboard-section-secondary);
+    border-radius: 4px;
+    border-color: var(--border);
+    border-width: 1px;
+}
+
+
+
+
 /* Light & Dark mode defaults */
 :root {
     --radius: 0.625rem;
@@ -630,4 +647,6 @@ input[disabled] {
     /* --input-bg: oklch(1 1 1); */
     --exercise-card-bg: oklch(0.205 0 0);
     --exercise-card-input: oklch(0.269 0.00 0);
+    --dashboard-section-primary: oklch(0.205 0 0);
+    --dashboard-section-secondary: oklch(0.269 0 0);
 }

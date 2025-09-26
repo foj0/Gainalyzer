@@ -66,27 +66,29 @@ export default async function Page() {
 
     // if logged in show home page info
     return (
-        <div className="flex flex-row">
-
-            {/* Sidebar navigation on the left */}
+        <div className="min-h-screen">
             <Sidebar />
+            <div className="md:pl-[200px] xl:pl-[300px]">
 
-            {/* Main content area */}
-            <main className="flex-1 flex flex-col items-center md:ml-[200px] xl:ml-[300px] mt-16 md:mt-0 p-6">
+                {/* Main content area */}
+                <main className="max-w-screen sm:max-w-3/4 mx-auto mt-16 md:mt-0 space-y-6">
 
-                <h1 className="text-2xl font-bold">Welcome to Gainalyzer</h1>
-                <button className='button'>
-                    <Link href="/log">
-                        Add Log
-                    </Link>
-                </button>
-                <p className="mt-4">Dashboard will go here.</p>
-                <Dashboard />
-                <br></br>
-                <div className="h-[2000px] mt-6">Scroll me</div>
-            </main >
+                    <div className="flex flex-col items-center">
+                        <h1 className="flex justify-center text-2xl font-bold my-10">Dashboard</h1>
+                        <button className='button w-fit'>
+                            <Link href="/log">
+                                Add Log
+                            </Link>
+                        </button>
+                    </div>
+                    <br></br>
+                    <div className="flex items-center justify-center">
+                        <Dashboard />
+                    </div>
+                </main >
 
 
-        </div >
+            </div >
+        </div>
     );
 }

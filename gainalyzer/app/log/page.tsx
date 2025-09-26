@@ -319,7 +319,8 @@ export default function LogPage() {
                                 />
                                 {/* use oninput filter to not allow letters */}
                                 <span>{weightMetric}</span>
-                                {/* onChange={} className={`grow`} placeholder='Email' value={inputs.email} name='email' required maxLength={254} /> */} </div>
+                                {/* onChange={} className={`grow`} placeholder='Email' value={inputs.email} name='email' required maxLength={254} /> */}
+                            </div>
 
                             {/* cals */}
                             <div className="flex justify-center items-center gap-2">
