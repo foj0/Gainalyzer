@@ -18,7 +18,7 @@ so it's not all just on one graph, in case you want to see different things
 1. Login/Register
     - email/password, email verification
     - first thing you see when you go to page (unless you're already logged in)
-2. Home Page
+2. Dashboard Page
     - Profile button to let you log out or whatever
     - Navbar at top
     - Main Graph system
@@ -28,6 +28,34 @@ so it's not all just on one graph, in case you want to see different things
     - A setting below graph to change timeline scale
     - a dropdown menu above graph title to change graph contents or category
     - A recently logged section showing recent activity feed
+
+---------------------------------------------------------
+|   Quick Stats                                          |
+|  [ Current Weight ]  [ Avg Calories ]  [ Strength PR ] |
+---------------------------------------------------------
+
+---------------------------------------------------------
+|                   Bodyweight Trend                    |
+|   [ Line Chart over time + dropdown for 7d/30d/90d ]   |
+---------------------------------------------------------
+
+---------------------------------------------------------
+|        Goals (if any)        |     Exercise Progress   |
+|  [ Progress bars OR link ]   |  [ Carousel of charts   |
+|                              |    Bench | Squat | ... ]|
+---------------------------------------------------------
+
+---------------------------------------------------------
+| Calories vs Bodyweight       | Bodyweight vs Strength  |
+|  [ Dual-axis line chart ]    | [ Scatter / biaxial ]  |
+|                              |   (Exercise selector)   |
+---------------------------------------------------------
+
+---------------------------------------------------------
+|            (Optional) Custom Comparisons              |
+|  [ User picks any 2 metrics → generates chart ]        |
+---------------------------------------------------------
+
 3. Log
     - can delete or edit previously logged data
     - Calendar date picker at the top. default to today
@@ -81,7 +109,6 @@ Delete option on the side.
 Also need to do something to remove exercises from create exercise list
 
 
-
 4. Goals
     - set goals
     - daily calorie goals (nah don't do this one, since we're not like myfitnesspal,
@@ -93,17 +120,6 @@ Also need to do something to remove exercises from create exercise list
     - change email/password/pfp
     - export data
     - clear data
-
-* Updated Home page Idea:
-    - Gainalyzer logo at the top, either at top left or center. Make logo link to home
-    - Profile icon on top left to go to profile settings or sign out.
-        * maybe give a dropdown option to go to profile or signout.
-    - Big "Add Log" button that opens modal to log stuff
-        or if already logged change to say "Edit Log"
-    - Once today's log is added update a daily snapshot section
-    to show today's logs. Otherwise show the most recent logs if any exist.
-    - If goals not set, have the section have a button to set them,
-        otherwise show goal progress bars
 
 * Maybe before login page, have a home page that tells users what the app is meant for
   kind of like getcracked.io

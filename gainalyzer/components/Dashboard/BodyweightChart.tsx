@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from "recharts";
+import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, TooltipProps, TooltipContentProps } from "recharts";
 import { chartDataReducer } from "recharts/types/state/chartDataSlice";
 
 type Log = {
@@ -39,7 +39,7 @@ export default function BodyweightChart({ logs }: { logs: any[] }) {
                 startDate.setDate(today.getDate() - (daysAgo - 1));
             }
 
-            // 1️⃣ filter logs within range
+            // 1️⃣ filter logs within rdate arange
             const filteredLogs =
                 range === "all"
                     ? logs
@@ -49,7 +49,7 @@ export default function BodyweightChart({ logs }: { logs: any[] }) {
             const weights = filteredLogs.map((l) => l.bodyweight).filter(Boolean) as number[];
             let paddedYMin = 0;
             let paddedYMax = 0;
-            let tickCount = 4;
+            let tickCount = 4; // default value 4
 
             if (weights.length) {
                 const minWeight = Math.min(...weights);
@@ -109,6 +109,25 @@ export default function BodyweightChart({ logs }: { logs: any[] }) {
         setYTickCount(chartData.yTickCount);
     }, [logs, dateRange, prepareChartData]);
 
+    const CustomTooltip = ({ active, payload, label }: TooltipContentProps<number, string>) => {
+        // active is true since we're hovering over a point
+        // payload is an array of obj representing the data at that point
+        // label is the x axis value
+        const isVisible = active && payload && payload.length;
+        return (
+            <div className="custom-tooltip" style={{ visibility: isVisible ? 'visible' : 'hidden' }}>
+                {isVisible && (
+                    <>
+                        {/* display date: weight */}
+                        <p className="label">{`${label}:`}</p>
+                        <p className="desc">{`${payload[0].value} lbs`}</p>
+                    </>
+
+                )}
+            </div>
+        );
+    };
+
     return (
         <div className="dashboard-section-1 rounded-lg shadow p-4 w-full">
             <div className="flex justify-between items-center mb-4">
@@ -155,6 +174,7 @@ export default function BodyweightChart({ logs }: { logs: any[] }) {
                             const d = new Date(dateStr);
                             return `${d.getMonth() + 1}/${d.getDate()}`;
                         }}
+                        content={CustomTooltip}
                     />
                     <Line type="monotone" dataKey="bodyweight" stroke="green" strokeWidth={2} dot={{ r: 3 }} connectNulls />
                 </LineChart>

@@ -161,11 +161,21 @@ should only have one set.
 * Spent hrs trying to figure out how to correctly type the supabase responses and how to filter and preprocess them.
 to avoid any typescript errors or complaints.
 
+## 9-25:
+* got gpt to give me a layout design for the dashboard
+* Made a quick stats section with current bodyweight, avg bodyweight, and avg calories (7 days)
+* Got the chart to scale according to the selected date range
+* need to make the hover show the date as well as the weight values
+* Made the bodyweight trend graph. Still working on getting it customized fully.
+    - might need to fix the all option? not sure, will have to fill in more dummy data to test
+
 ### todo:
+* Need to Split the quick stats into (weight /cal) bubbles and have images in each (scale/food icons)
+* Move all log colors down one. Darker looks better
+* On the quick stats have a hover popup that says that the avg is taken over the last 7 days for weight/cal
 * Start on Dashboard. Get a graph up for the bodyweight or something
     - app/dashboard/page should be server component, insert a separate client dashboard component within it.
     - Should I do similar thing to make loading pages faster? idk
-    - try to figure out how to fetch logs myself
 * Might need to edit the FetchLogForDate function to use log_id and not log_date
 * In the calendar picker highlight days with filled in logs?
 * Setup some cache for date logs so we don't have to keep fetching from db every time
