@@ -169,6 +169,10 @@ to avoid any typescript errors or complaints.
 * Made the bodyweight trend graph. Still working on getting it customized fully.
     - might need to fix the all option? not sure, will have to fill in more dummy data to test
 
+## 9-26:
+* Made the BiaxialLineChart for weight/cals.
+* Spent some time polishing it to be responsive for mobile
+
 ### todo:
 * Need to Split the quick stats into (weight /cal) bubbles and have images in each (scale/food icons)
 * Move all log colors down one. Darker looks better
