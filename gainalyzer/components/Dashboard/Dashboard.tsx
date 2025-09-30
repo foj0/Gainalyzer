@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
 import {
     LineChart,
     Line,
@@ -12,6 +13,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import BodyweightChart from "./BodyweightChart";
+import ExerciseBodyweightChart from "./ExercerciseBodyweightChart";
 
 // raw type of what supabase returns
 type SupabaseLogResult = {
@@ -54,13 +56,40 @@ export default function Dashboard() {
     const [logs, setLogs] = useState<Log[]>([]);
     const [loading, setLoading] = useState(true);
     const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [userExercises, setUserExercises] = useState<{ id: string, name: string }[] | null>(null);
+
+    useEffect(() => {
+        async function fetchUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            setUser(user);
+        }
+        fetchUser();
+    }, [supabase])
+
+    useEffect(() => {
+        async function fetchUserExercises() {
+            if (!user) return;
+
+            const response = await supabase
+                .from("exercises")
+                .select("id, name")
+                .eq("user_id", user.id)
+
+            // console.log("response", response);
+            const exercises = response.data;
+            setUserExercises(exercises);
+        }
+
+        fetchUserExercises();
+    }, [supabase, user])
 
     useEffect(() => {
         async function fetchLogs() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                return;
-            }
+            if (!user) return;
+
+            // console.log("fetching logs")
             const response = await supabase
                 .from("logs")
                 .select(`
@@ -80,12 +109,11 @@ export default function Dashboard() {
             const userLogs = response.data as SupabaseLogResult[] | null; // cast the response as our defined type
             const error = response.error;
 
-
             if (error && error.code !== "PGRST116") { // 116 = no rows found
                 console.error("Error fetching log:", error);
                 return;
             } else if (userLogs) {
-                console.log("Raw logs", userLogs)
+                // console.log("Raw logs", userLogs)
 
                 const formattedLogs: Log[] = userLogs.map((log) => (
                     {
@@ -109,7 +137,7 @@ export default function Dashboard() {
         }
 
         fetchLogs();
-    }, [supabase]);
+    }, [supabase, user]);
 
     function calculateAverageBWCals(logs: Log[]) {
         if (!logs || logs.length === 0) {
@@ -169,9 +197,9 @@ export default function Dashboard() {
         }
         setQuickStats(
             {
-                currentBodyweight: currentBodyweight,
-                avgBodyweight: avgBodyweight,
-                avgCalories: avgCalories
+                currentBodyweight: currentBodyweight ?? null,
+                avgBodyweight: avgBodyweight ?? null,
+                avgCalories: avgCalories ?? null
             }
         )
 
@@ -187,41 +215,25 @@ export default function Dashboard() {
                     {/* weight */}
                     <div className="flex sm:flex-col gap-2">
                         <div>Current Weight:</div>
-                        <div>{quickStats?.currentBodyweight}<span> lbs</span></div>
+                        <div>{quickStats?.currentBodyweight ?? "N/A"}<span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span></div>
                     </div>
 
                     <div className="flex sm:flex-col gap-2">
                         <div>Avg Weight:</div>
-                        <div>{quickStats?.avgBodyweight}<span> lbs</span></div>
+                        <div>{quickStats?.avgBodyweight ?? "N/A"}<span> {quickStats?.avgBodyweight != null ? " lbs" : ""} </span></div>
                     </div>
 
                     {/* cals */}
                     <div className="flex sm:flex-col gap-2">
                         <div>Avg Calories:</div>
-                        <div>{quickStats?.avgCalories}<span> kcal</span></div>
+                        <div>{quickStats?.avgCalories ?? "N/A"}<span> {quickStats?.avgCalories != null ? " lbs" : ""} </span></div>
                     </div>
                 </div>
             </div>
 
-
-            <div className="flex justify-center mt-10">
+            <div className="flex flex-col lg:flex-row justify-center mt-10 gap-4">
                 <BodyweightChart logs={logs} />
-                {/* <h2 className="flex justify-center text-xl font-bold mb-2">Bodyweight</h2> */}
-                {/* <ResponsiveContainer width="100%" height={300}> */}
-                {/*     <LineChart data={logs}> */}
-                {/*         <CartesianGrid strokeDasharray="3 3" /> */}
-                {/*         <XAxis dataKey="log_date" /> */}
-                {/*         <YAxis /> */}
-                {/*         <Tooltip /> */}
-                {/*         <Line */}
-                {/*             type="monotone" */}
-                {/*             dataKey="bodyweight" */}
-                {/*             stroke="#8884d8" */}
-                {/*             strokeWidth={2} */}
-                {/*             dot={{ r: 3 }} */}
-                {/*         /> */}
-                {/*     </LineChart> */}
-                {/* </ResponsiveContainer> */}
+                <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
             </div>
 
         </div>
