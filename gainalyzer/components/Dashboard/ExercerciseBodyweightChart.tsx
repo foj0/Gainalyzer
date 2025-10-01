@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 import { ResponsiveContainer, Legend, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, TooltipProps, TooltipContentProps } from "recharts";
 
 type Exercise = {
@@ -19,9 +19,10 @@ type Log = {
 type ExerciseLog = {
     bodyweight: number | null;
     log_date: string;
+    exercise_name: string | null;
     weight: number | null;
     reps: number | null;
-    strength: number | null; // we'll compute an estimated 1RM for the selected exercise if it exists on this date and store here
+    strength: number | null; // estimated 1RM
     // on hover over the data point it should show the weight and reps
 }
 
@@ -35,13 +36,21 @@ interface ChartData {
 
 export default function ExerciseBodyweightChart({ logs, userExercises }: { logs: Log[], userExercises: { id: string, name: string }[] | null }) {
     const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "180d" | "365d" | "all">("all");
-    const [selectedExercise, setSelectedExercise] = useState<string>("Bench Press");
-    const [bwDomain, setBwDomain] = useState<{ bwMin: number, bwMax: number }>({ bwMin: 100, bwMax: 200 })
-    const [exDomain, setExDomain] = useState<{ exMin: number, exMax: number }>({ exMin: 50, exMax: 200 })
-    const [yTickCount, setYTickCount] = useState<number>(4);
-    const [xTicks, setXTicks] = useState<string[]>([]);
-    const [preparedLogs, setPreparedLogs] = useState<ExerciseLog[]>([]); // logs prepared for chart, only logs within date range, missing dates are filled in with null values
+    const [selectedExercise, setSelectedExercise] = useState<string>("");
     const [isMobile, setIsMobile] = useState(false);
+
+    // set selectedExercise as the most recently logged exercise
+    useEffect(() => {
+        if (!selectedExercise && logs.length > 0) {
+            for (let i = logs.length - 1; i >= 0; i--) {
+                const exercises = logs[i].exercises;
+                if (exercises.length > 0) {
+                    setSelectedExercise(exercises[exercises.length - 1].name);
+                    break;
+                }
+            }
+        }
+    }, [logs, selectedExercise]); // only run when logs change, or basically just on mount
 
     // Check if windowsize is mobile size on mount and resize
     useEffect(() => {
@@ -66,136 +75,130 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
         };
     }, []);
 
-    // ⬇️ helper to compute everything at once
-    const prepareChartData = useCallback(
-        (logs: Log[], range: typeof dateRange): ChartData => {
-            const today = new Date();
-            let startDate: Date;
+    // 🔹 All chart data computed
+    const chartData = useMemo((): ChartData => {
+        const today = new Date();
 
-            if (range === "all") {
-                startDate = logs.length ? new Date(logs[0].log_date) : new Date();
-            } else {
-                startDate = new Date();
-                const daysAgo = parseInt(range);
-                startDate.setDate(today.getDate() - (daysAgo - 1));
-            }
+        // 0️⃣ sort logs by date ascending (oldest → newest)
+        const sortedLogs = [...logs].sort(
+            (a, b) => new Date(a.log_date).getTime() - new Date(b.log_date).getTime()
+        );
 
-            // 1️⃣ filter logs within rdate range
-            const filteredLogs = logs.filter((log) => new Date(log.log_date) >= startDate);
+        // 1️⃣ dtermine start date
+        let startDate: Date;
+        if (dateRange === "all") {
+            startDate = sortedLogs.length ? new Date(sortedLogs[0].log_date) : new Date();
+        } else {
+            startDate = new Date();
+            const daysAgo = parseInt(dateRange);
+            startDate.setDate(today.getDate() - (daysAgo - 1));
+        }
 
-            // convert logs to ExerciseLog
-            const exerciseLogs: ExerciseLog[] = filteredLogs.map((log) => {
-                const exercise = log.exercises.find((ex) => ex.name === selectedExercise);
-                let strength: number | null = null;
+        // 2️⃣ filter logs within date range
+        const filteredLogs = sortedLogs.filter((log) => new Date(log.log_date) >= startDate);
 
-                if (exercise?.weight != null && exercise?.reps != null) {
-                    // Matt Brzycki 1RM formula
-                    strength = exercise.weight / (1.0278 - 0.0278 * exercise.reps);
-                }
+        // 3️⃣ convert to ExerciseLog for the selected exercise
+        const exerciseLogs: ExerciseLog[] = filteredLogs.map((log) => {
+            const exercise = log.exercises.find((ex) => ex.name === selectedExercise);
+            let strength: number | null = null;
 
-                return {
-                    bodyweight: log.bodyweight,
-                    log_date: log.log_date,
-                    weight: exercise?.weight ?? null,
-                    reps: exercise?.reps ?? null,
-                    strength,
-                };
-            });
-
-            // 2 fill missing dates
-            const logMap = new Map(exerciseLogs.map((l) => [l.log_date, l]));
-            const filledLogs: ExerciseLog[] = [];
-            const cursor = new Date(startDate);
-
-            while (cursor <= today) {
-                const dateStr = cursor.toISOString().split("T")[0];
-                if (logMap.has(dateStr)) {
-                    filledLogs.push(logMap.get(dateStr)!);
-                } else {
-                    filledLogs.push({
-                        log_date: dateStr,
-                        bodyweight: null,
-                        weight: null,
-                        reps: null,
-                        strength: null,
-                    });
-                }
-                cursor.setDate(cursor.getDate() + 1);
-            }
-
-            // compute bodyweight domain
-            const bodyweights = filledLogs.map((l) => l.bodyweight).filter((v): v is number => v != null);
-            let paddedBwMin = 0, paddedBwMax = 0;
-            let yTickCount = 4; // default val of 4 ticks
-
-            if (bodyweights.length) {
-                const minWeight = Math.min(...bodyweights);
-                const maxWeight = Math.max(...bodyweights);
-
-                paddedBwMin = Math.floor(minWeight / 5) * 5 - 5; // round to the nearest increment of 5 then add 5 padding
-                paddedBwMax = Math.ceil(maxWeight / 5) * 5 + 5;
-
-                const yRange = paddedBwMax - paddedBwMin;
-                if (yRange <= 15) yTickCount = 4;
-                else if (yRange <= 30) yTickCount = 6;
-                else if (yRange <= 50) yTickCount = 8;
-                else yTickCount = 10;
-            }
-
-            // compute strength domain
-            const strengths = filledLogs.map((l) => l.strength).filter((v): v is number => v != null);
-            let paddedExMin = 0, paddedExMax = 0;
-
-            if (strengths.length) {
-                const minStrength = Math.min(...strengths);
-                const maxStrength = Math.max(...strengths);
-
-                paddedExMin = Math.floor(minStrength / 10) * 10 - 10;
-                paddedExMax = Math.ceil(maxStrength / 10) * 10 + 10;
-            }
-
-
-            // 4️⃣ compute sparse X ticks
-            let intervalDays = 1;
-            if (range === "7d") intervalDays = 1;
-            else if (range === "30d") intervalDays = 7;
-            // less ticks on mobile so it doesn't look cluttered
-            else if (range === "90d") intervalDays = isMobile ? 14 : 7;
-            else if (range === "180d") intervalDays = isMobile ? 30 : 14;
-            else if (range === "365d") intervalDays = isMobile ? 60 : 30;
-            else if (range === "all") {
-                const totalDays = Math.ceil(
-                    (today.getTime() - new Date(filteredLogs[0].log_date).getTime()) / (1000 * 60 * 60 * 24)
-                );
-                const maxTicks = isMobile ? 8 : 12; // limit ticks so we don't get too many
-                intervalDays = Math.ceil(totalDays / maxTicks); // spread ticks evenly
-            }
-
-            const xTicks: string[] = [];
-            const tickCursor = new Date(startDate);
-            while (tickCursor <= today) {
-                xTicks.push(tickCursor.toISOString().split("T")[0]);
-                tickCursor.setDate(tickCursor.getDate() + intervalDays);
+            if (exercise?.weight != null && exercise?.reps != null) {
+                // Matt Brzycki 1RM formula
+                strength = exercise.weight / (1.0278 - 0.0278 * exercise.reps);
             }
 
             return {
-                filledLogs,
-                xTicks,
-                bwDomain: { bwMin: paddedBwMin, bwMax: paddedBwMax }, exDomain: { exMin: paddedExMin, exMax: paddedExMax },
-                yTickCount: yTickCount
+                bodyweight: log.bodyweight,
+                log_date: log.log_date,
+                exercise_name: exercise?.name ?? null,
+                weight: exercise?.weight ?? null,
+                reps: exercise?.reps ?? null,
+                strength,
             };
-        }, []
-    );
+        });
 
-    // 🔄 recompute whenever logs or dateRange changes
-    useEffect(() => {
-        const chartData = prepareChartData(logs, dateRange);
-        setPreparedLogs(chartData.filledLogs);
-        setXTicks(chartData.xTicks);
-        setBwDomain(chartData.bwDomain);
-        setExDomain(chartData.exDomain);
-        setYTickCount(chartData.yTickCount);
-    }, [logs, isMobile, dateRange, selectedExercise, prepareChartData]);
+        // 4️⃣ fill missing dates
+        const logMap = new Map(exerciseLogs.map((l) => [l.log_date, l]));
+        const filledLogs: ExerciseLog[] = [];
+        const cursor = new Date(startDate);
+
+        while (cursor <= today) {
+            const dateStr = cursor.toISOString().split("T")[0];
+            if (logMap.has(dateStr)) {
+                filledLogs.push(logMap.get(dateStr)!);
+            } else {
+                filledLogs.push({
+                    log_date: dateStr,
+                    bodyweight: null,
+                    exercise_name: null,
+                    weight: null,
+                    reps: null,
+                    strength: null,
+                });
+            }
+            cursor.setDate(cursor.getDate() + 1);
+        }
+
+        // 4️⃣ compute domains
+        const bodyweights = filledLogs.map((l) => l.bodyweight).filter((v): v is number => v != null);
+        let paddedBwMin = 0, paddedBwMax = 0;
+        let yTickCount = 4;
+
+        if (bodyweights.length) {
+            const minWeight = Math.min(...bodyweights);
+            const maxWeight = Math.max(...bodyweights);
+            paddedBwMin = Math.floor(minWeight / 5) * 5 - 5;
+            paddedBwMax = Math.ceil(maxWeight / 5) * 5 + 5;
+            const yRange = paddedBwMax - paddedBwMin;
+            if (yRange <= 15) yTickCount = 4;
+            else if (yRange <= 30) yTickCount = 6;
+            else if (yRange <= 50) yTickCount = 8;
+            else yTickCount = 10;
+        }
+
+        const strengths = filledLogs.map((l) => l.strength).filter((v): v is number => v != null);
+        let paddedExMin = 0, paddedExMax = 0;
+
+        if (strengths.length) {
+            const minStrength = Math.min(...strengths);
+            const maxStrength = Math.max(...strengths);
+            paddedExMin = Math.floor(minStrength / 10) * 10 - 10;
+            paddedExMax = Math.ceil(maxStrength / 10) * 10 + 10;
+        }
+
+        // 5️⃣ compute X ticks, Y axis domains, etc.
+        let intervalDays = 1;
+        if (dateRange === "7d") intervalDays = 1;
+        else if (dateRange === "30d") intervalDays = 7;
+        else if (dateRange === "90d") intervalDays = isMobile ? 14 : 7;
+        else if (dateRange === "180d") intervalDays = isMobile ? 30 : 14;
+        else if (dateRange === "365d") intervalDays = isMobile ? 60 : 30;
+        else if (dateRange === "all") {
+            const totalDays = Math.ceil(
+                (today.getTime() - new Date(filteredLogs[0].log_date).getTime()) / (1000 * 60 * 60 * 24)
+            );
+            const maxTicks = isMobile ? 8 : 12;
+            intervalDays = Math.ceil(totalDays / maxTicks);
+        }
+
+        const xTicks: string[] = [];
+        const tickCursor = new Date(startDate);
+        while (tickCursor <= today) {
+            xTicks.push(tickCursor.toISOString().split("T")[0]);
+            tickCursor.setDate(tickCursor.getDate() + intervalDays);
+        }
+
+        return {
+            filledLogs,
+            xTicks,
+            bwDomain: { bwMin: paddedBwMin, bwMax: paddedBwMax },
+            exDomain: { exMin: paddedExMin, exMax: paddedExMax },
+            yTickCount,
+        };
+    }, [logs, dateRange, selectedExercise, isMobile]);
+
+    // 🔹 Now just destructure chartData to pass in the variables to recharts
+    const { filledLogs: preparedLogs, xTicks, bwDomain, exDomain, yTickCount } = chartData;
 
     const unitMap: Record<string, string> = {
         bodyweight: "lbs",
@@ -299,6 +302,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
                         yAxisId="left"
                     />
                     <YAxis
+                        domain={[exDomain.exMin, exDomain.exMax]}
                         tickCount={yTickCount}
                         tickLine={false}
                         axisLine={false}

@@ -56,6 +56,9 @@ so it's not all just on one graph, in case you want to see different things
 |  [ User picks any 2 metrics → generates chart ]        |
 ---------------------------------------------------------
 
+Maybe make the bodyweight/cal and bodyweight/exercise charts on the same row (for desktop)
+and stacked on mobile or smaller screens. The graphs look weird being really long.
+
 3. Log
     - can delete or edit previously logged data
     - Calendar date picker at the top. default to today

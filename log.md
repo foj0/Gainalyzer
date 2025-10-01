@@ -173,7 +173,24 @@ to avoid any typescript errors or complaints.
 * Made the BiaxialLineChart for weight/cals.
 * Spent some time polishing it to be responsive for mobile
 
+## 9-29:
+* Fixed quick stats section handling null values
+
+## 9-30:
+* Worked on getting the exercise info and logging it.
+* Transformed Type Log into Exercise log, calculating the estimated 1RM and making it
+into a type that we can easily plot.
+* Really tried doing things myself, not using AI to generate code for me.
+
+## 10-01:
+* got the line chart to show exercise info
+
 ### todo:
+* Log exercise search doesnt work?
+* Make the pick date calendar start at the current log date, not today's actual date.
+* Make it so that you can't save a log without filling in the weight/reps in an exercise card
+* Create an exercise selector dropdown that pulls from the users exercises, default to the most recently added
+, and show blank or just "exercise" if there's none.
 * Need to Split the quick stats into (weight /cal) bubbles and have images in each (scale/food icons)
 * Move all log colors down one. Darker looks better
 * On the quick stats have a hover popup that says that the avg is taken over the last 7 days for weight/cal
