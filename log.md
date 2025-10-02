@@ -184,9 +184,11 @@ into a type that we can easily plot.
 
 ## 10-01:
 * got the line chart to show exercise info
+* Fixed exercise combobox search not working. Changed input value to use name not id.
 
 ### todo:
 * Log exercise search doesnt work?
+* Should make a thing to create a workout template and add all those exercises in one go.
 * Make the pick date calendar start at the current log date, not today's actual date.
 * Make it so that you can't save a log without filling in the weight/reps in an exercise card
 * Create an exercise selector dropdown that pulls from the users exercises, default to the most recently added

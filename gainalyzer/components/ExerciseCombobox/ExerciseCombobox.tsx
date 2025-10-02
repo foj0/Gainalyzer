@@ -54,9 +54,11 @@ export function ExerciseCombobox({ exercises, setExercises, value, onChange }: E
                             {exercises.map((exercise) => (
                                 <CommandItem
                                     key={exercise.id}
-                                    value={exercise.id}
-                                    onSelect={(currentId) => {
-                                        const newId = currentId === value ? null : currentId
+                                    value={exercise.name} // use name to filter search results
+                                    onSelect={() => {
+                                        // store the id in state, not the name
+                                        // If the user clicked the exercise that’s already selected, deselect it. Otherwise, select the clicked exercise.
+                                        const newId = value === exercise.id ? null : exercise.id
                                         onChange(newId)
                                         setOpen(false)
                                     }}

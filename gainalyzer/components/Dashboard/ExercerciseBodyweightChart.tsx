@@ -84,7 +84,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
             (a, b) => new Date(a.log_date).getTime() - new Date(b.log_date).getTime()
         );
 
-        // 1️⃣ dtermine start date
+        // 1️⃣ determine start date
         let startDate: Date;
         if (dateRange === "all") {
             startDate = sortedLogs.length ? new Date(sortedLogs[0].log_date) : new Date();
