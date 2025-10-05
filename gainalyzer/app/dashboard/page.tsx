@@ -71,23 +71,13 @@ export default async function Page() {
             <div className="md:pl-[200px] xl:pl-[300px]">
 
                 {/* Main content area */}
-                <main className="max-w-screen sm:max-w-3/4 mx-auto mt-16 md:mt-0 space-y-6">
-
-                    <div className="flex flex-col items-center">
-                        <h1 className="flex justify-center text-2xl font-bold my-10">Dashboard</h1>
-                        <button className='button w-fit'>
-                            <Link href="/log">
-                                Add Log
-                            </Link>
-                        </button>
-                    </div>
-                    <br></br>
-                    <div className="flex items-center justify-center">
+                {/* <main className="max-w-screen sm:max-w-3/4 mx-auto mt-16 md:mt-0 space-y-6"> */}
+                {/* Mess around with the width maybe? Too wide looks odd. */}
+                <main className="max-w-screen mx-auto mt-16 md:mt-0 space-y-6">
+                    <div className="flex items-center justify-center p-6">
                         <Dashboard />
                     </div>
                 </main >
-
-
             </div >
         </div>
     );

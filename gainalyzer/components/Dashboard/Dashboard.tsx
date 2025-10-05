@@ -12,6 +12,7 @@ import {
     CartesianGrid,
     ResponsiveContainer,
 } from "recharts";
+import HelloSection from "./HelloSection";
 import BodyweightChart from "./BodyweightChart";
 import ExerciseBodyweightChart from "./ExercerciseBodyweightChart";
 
@@ -207,33 +208,54 @@ export default function Dashboard() {
 
     if (loading) return <p>Loading...</p>;
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full gap-6">
 
-            <div className="dashboard-section-1 w-full ">
-                <div className="flex justify-center text-xl mt-4 ml-4 mb-2">Quick Stats</div>
-                <div className="flex flex-col sm:flex-row sm:justify-around gap-4 px-4 py-3 text-md w-full rounded-lg">
-                    {/* weight */}
-                    <div className="flex sm:flex-col gap-2">
-                        <div>Current Weight:</div>
-                        <div>{quickStats?.currentBodyweight ?? "N/A"}<span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span></div>
-                    </div>
+            <div className="flex flex-row gap-6">
+                <div className="dashboard-section-1 w-6/10 p-6">
+                    <HelloSection />
+                </div>
+                <div className="dashboard-section-1 h-70 w-4/10">Goal progress</div>
+            </div>
+            <div className="flex justify-center text-xl mt-4 ml-4 mb-2">Quick Stats</div>
 
-                    <div className="flex sm:flex-col gap-2">
-                        <div>Avg Weight:</div>
-                        <div>{quickStats?.avgBodyweight ?? "N/A"}<span> {quickStats?.avgBodyweight != null ? " lbs" : ""} </span></div>
-                    </div>
+            <div className="flex flex-col sm:flex-row sm:justify-around px-4 py-3 text-md w-full rounded-lg">
+                {/* weight */}
+                <div className="flex sm:flex-col gap-2">
+                    <div>Current Weight:</div>
+                    <div>{quickStats?.currentBodyweight ?? "N/A"}<span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span></div>
+                </div>
 
-                    {/* cals */}
-                    <div className="flex sm:flex-col gap-2">
-                        <div>Avg Calories:</div>
-                        <div>{quickStats?.avgCalories ?? "N/A"}<span> {quickStats?.avgCalories != null ? " lbs" : ""} </span></div>
-                    </div>
+                <div className="flex sm:flex-col gap-2">
+                    <div>Avg Weight:</div>
+                    <div>{quickStats?.avgBodyweight ?? "N/A"}<span> {quickStats?.avgBodyweight != null ? " lbs" : ""} </span></div>
+                </div>
+
+                {/* cals */}
+                <div className="flex sm:flex-col gap-2">
+                    <div>Avg Calories:</div>
+                    <div>{quickStats?.avgCalories ?? "N/A"}<span> {quickStats?.avgCalories != null ? " lbs" : ""} </span></div>
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row justify-center mt-10 gap-4">
-                <BodyweightChart logs={logs} />
+            <div className="flex flex-col lg:flex-row justify-center gap-6">
+                {/* <BodyweightChart logs={logs} /> */}
                 <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
+                <div className="dashboard-section-1 w-5/10">
+                    AI Analysis of bodyweight and exercise progress.
+                    Have some AI related image, and a big button and header
+                    saying click to analyze results.
+                </div>
+            </div>
+
+            <div className="flex flex-col lg:flex-row justify-center gap-6">
+                <div className="dashboard-section-1 w-4/10 h-100">
+                    table carousel of exercise logs
+                    one at a time
+                </div>
+                <div className="dashboard-section-1 w-6/10">
+                    daily calorie chart over the past 7 days
+                    or some other bar chart.
+                </div>
             </div>
 
         </div>

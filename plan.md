@@ -59,6 +59,27 @@ so it's not all just on one graph, in case you want to see different things
 Maybe make the bodyweight/cal and bodyweight/exercise charts on the same row (for desktop)
 and stacked on mobile or smaller screens. The graphs look weird being really long.
 
+New idea:
+Instead of a lot of blank space, make everything scale larger and take up most of the screen.
+Row 1:
+    On top left have a big box saying welcome back [user name] wave emoji and three subboxes
+    for the quick stats with emoji type images for the stat.
+    To the right we have the goals section with a few progress bars (weight, estimated 1rm)
+        progress (how much weight we've gone up / down)
+        target (goal weight)
+        daily calorie goal how much you ate
+        a set fitness goals button
+Row 2:
+The bodyweight/exercise trend graph. on the left.
+On the right have some AI generated response that analyzes your chart and tells you
+if you're on the right track. Like are you gaining strength at a good rate, gaining too much
+weight too fast? Not gaining enough weight? Etc. This is a good way to integrate AI.
+50/50 each side.
+Row 3:
+A bar chart showing most frequent exercises or daily calories over the past week.
+A carousel for exercises were it shows a table of your recent logs. Like date, weight, reps.
+
+
 3. Log
     - can delete or edit previously logged data
     - Calendar date picker at the top. default to today
@@ -129,3 +150,6 @@ Also need to do something to remove exercises from create exercise list
 
 * Change flow to redirect to home by default, from home have a login button 
   that takes to login page.
+
+Inspo:
+https://dribbble.com/shots/23445464--ANIMATION-FitPower-SaaS-Workout-Platform

@@ -241,11 +241,11 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
     return (
         <div className="dashboard-section-1 rounded-lg shadow lg:w-5/10">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold m-2">Bodyweight & Exercise</h2>
+                <h2 className="text-xl font-bold m-2">Weight & Strength</h2>
                 <select
                     value={selectedExercise}
                     onChange={(e) => setSelectedExercise(e.target.value as string)}
-                    className="border rounded px-2 py-1 text-sm m-2"
+                    className="w-30 border rounded px-2 py-1 text-sm m-2"
                 >
                     <option value="" disabled>
                         Select exercise

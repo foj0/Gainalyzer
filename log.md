@@ -186,8 +186,14 @@ into a type that we can easily plot.
 * got the line chart to show exercise info
 * Fixed exercise combobox search not working. Changed input value to use name not id.
 
+## 10-02:
+* Planned out more of how the dashboard will look
+* Started the new welcome section.
+* Fixed the x axis ticks on chart not being sparse enough
+
 ### todo:
-* Log exercise search doesnt work?
+* Fix the x axis ticks. They're not changing for some reason.
+* Fix the "All" on the first bodyweight chart
 * Should make a thing to create a workout template and add all those exercises in one go.
 * Make the pick date calendar start at the current log date, not today's actual date.
 * Make it so that you can't save a log without filling in the weight/reps in an exercise card

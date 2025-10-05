@@ -138,7 +138,7 @@ export default function BodyweightChart({ logs }: { logs: any[] }) {
 
             return { filledLogs, xTicks, bwDomain: { bwMin: paddedBwMin, bwMax: paddedBwMax }, calDomain: { calMin: paddedCalMin, calMax: paddedCalMax }, yTickCount: tickCount };
         },
-        []
+        [isMobile]
     );
 
     // 🔄 recompute whenever logs or dateRange changes
@@ -190,9 +190,10 @@ export default function BodyweightChart({ logs }: { logs: any[] }) {
     }
 
     return (
-        <div className="dashboard-section-1 rounded-lg shadow lg:w-5/10">
+        // <div className="dashboard-section-1 rounded-lg shadow lg:w-5/10">
+        <div className="dashboard-section-1 rounded-lg shadow w-5/10">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold m-2">Bodyweight & Calories</h2>
+                <h2 className="text-xl font-bold m-2">Weight & Calories</h2>
                 <select
                     value={dateRange}
                     onChange={(e) => setDateRange(e.target.value as any)}
