@@ -1,5 +1,7 @@
 import { useMemo, useCallback, useEffect, useState } from "react";
 import { ResponsiveContainer, Legend, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, TooltipProps, TooltipContentProps } from "recharts";
+import { Select } from "@radix-ui/react-select";
+import ExerciseSelect from "./ExerciseSelect";
 
 type Exercise = {
     weight: number | null;
@@ -245,7 +247,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
                 <select
                     value={selectedExercise}
                     onChange={(e) => setSelectedExercise(e.target.value as string)}
-                    className="w-30 border rounded px-2 py-1 text-sm m-2"
+                    className="w-30 border rounded px-2 py-1 text-sm m-2 max-h-20 overflow-y-auto"
                 >
                     <option value="" disabled>
                         Select exercise

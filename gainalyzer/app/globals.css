@@ -554,7 +554,24 @@ input[disabled] {
     border-width: 1px;
 }
 
+/* .exercise-select { */
+/*     background-color: */
+/* } */
 
+
+select {
+    background-color: var(--dashboard-section-primary);
+    border-color: oklch(0.922 0 0);
+}
+
+option {
+    /* background-color: var(--dashboard-section-primary); */
+    background-color: var(--dashboard-section-primary);
+}
+
+option:hover {
+    background-color: green;
+}
 
 
 /* Light & Dark mode defaults */
@@ -595,6 +612,8 @@ input[disabled] {
     --input-bg: oklch(.922 0 0);
     --exercise-card-bg: oklch(0.985 0 0);
     --exercise-card-input: oklch(0.97 0.00 0);
+    --dashboard-section-primary: oklch(0.985 0 0);
+    --dashboard-section-secondary: oklch(0.97 0 0);
 }
 
 .dark {

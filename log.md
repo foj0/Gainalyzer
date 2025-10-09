@@ -192,6 +192,7 @@ into a type that we can easily plot.
 * Fixed the x axis ticks on chart not being sparse enough
 
 ### todo:
+* Redo the exercise and date range selects to be better looking and limit how many options show at once on exercise select.
 * Fix the x axis ticks. They're not changing for some reason.
 * Fix the "All" on the first bodyweight chart
 * Should make a thing to create a workout template and add all those exercises in one go.
