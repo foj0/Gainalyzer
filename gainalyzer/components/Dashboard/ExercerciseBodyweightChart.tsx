@@ -242,8 +242,10 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
 
     return (
         <div className="dashboard-section-1 rounded-lg shadow lg:w-5/10">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-center">
                 <h2 className="text-xl font-bold m-2">Weight & Strength</h2>
+            </div>
+            <div className="flex justify-end items-center mb-4">
                 <select
                     value={selectedExercise}
                     onChange={(e) => setSelectedExercise(e.target.value as string)}
@@ -275,7 +277,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
             </div>
 
 
-            <ResponsiveContainer width="100%" height={isMobile ? 200 : 450}>
+            <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
                 <LineChart
                     data={preparedLogs}
                     margin={{ top: 5, right: 0, left: 0, bottom: 10 }}

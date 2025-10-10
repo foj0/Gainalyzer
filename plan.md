@@ -79,6 +79,41 @@ Row 3:
 A bar chart showing most frequent exercises or daily calories over the past week.
 A carousel for exercises were it shows a table of your recent logs. Like date, weight, reps.
 
+Mobile:
+* At the top, not in a box, have the welcome user "wave"
+* Below that we have a 2x2 grid with 4 boxes:
+    1. Current weight: (most recent log weight, or N/A and tells you to log)
+    2. Calories: (today's calories, no progress bar just a number and a icon or something)
+    3. weekly avg weight (or null and say not enough info if haven't logged)
+    4. protein: (daily protein, so we can have ai analyze if you're eating enough protein)
+* Goals:
+    1. bodyweight goal with progress (how much left to go/how much you've gained/loss)
+    2. daily cal goal (circular progress bar or some other bar)
+    3. Exercise goal (bench 225 x 1, your closest was x, using an estimated 1rm); will need a way to add exercises 
+        without having to go to log.
+    Some button right below this section to go to a goals page to add goals. "Add goals"
+    Each goal can be its own larger box. takes up whole screen width, as opposed to the 2x2 grid section
+* Bodyweight/exercise trend graph
+* AI analyzer
+* Don't think we need anything else that's the main thing. But optionally, at the end of everything can add
+    -a carousel for exercises showing a table of recent logs.
+    - a bar chart showing daily calories over a week or something
+
+Desktop:
+* At the top center: Welcome user *wave*
+# Row1:
+* 4 boxes in a row for quick stats instead of a grid in mobile
+* Goal section
+# Row2:
+* Bodyweight/exercise trend graph
+* AI analyzer
+# Row3: optional
+* exercise carousel
+* weekly calorie bar chart
+
+make desktop less width if looks too sparse with this stuff
+
+
 
 3. Log
     - can delete or edit previously logged data

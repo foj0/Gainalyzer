@@ -13,9 +13,11 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import HelloSection from "./HelloSection";
-import BodyweightChart from "./BodyweightChart";
 import ExerciseBodyweightChart from "./ExercerciseBodyweightChart";
-
+import { Scale, Flame, TrendingUp, Drumstick, Flag, Utensils } from "lucide-react"
+import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 // raw type of what supabase returns
 type SupabaseLogResult = {
     log_date: string;
@@ -59,14 +61,20 @@ export default function Dashboard() {
     const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [userExercises, setUserExercises] = useState<{ id: string, name: string }[] | null>(null);
+    const [fullName, setFullName] = useState<string>("");
 
     useEffect(() => {
         async function fetchUser() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
             setUser(user);
+            const userFullName = user?.identities
+                ?.find((identity) => identity.identity_data?.full_name)
+                ?.identity_data?.full_name || "User";
+            setFullName(userFullName);
         }
         fetchUser();
+
     }, [supabase])
 
     useEffect(() => {
@@ -84,6 +92,7 @@ export default function Dashboard() {
         }
 
         fetchUserExercises();
+        console.log(user);
     }, [supabase, user])
 
     useEffect(() => {
@@ -210,54 +219,161 @@ export default function Dashboard() {
     return (
         <div className="flex flex-col w-full gap-6">
 
-            <div className="flex flex-row gap-6">
-                <div className="dashboard-section-1 w-6/10 p-6">
-                    <HelloSection />
+            <HelloSection fullName={fullName} />
+
+
+            {/* <div className="flex justify-center text-xl mt-4 ml-4 mb-2">Quick Stats</div> */}
+            {/* <div className="flex flex-col sm:flex-row sm:justify-around px-4 py-3 text-md w-full rounded-lg"> */}
+            {/* <div className="flex sm:flex-col gap-2"> */}
+            {/*     <div>Current Weight:</div> */}
+            {/*     <div>{quickStats?.currentBodyweight ?? "N/A"}<span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span></div> */}
+            {/* </div> */}
+
+            {/* <div className="flex sm:flex-col gap-2"> */}
+            {/*     <div>Avg Weight:</div> */}
+            {/*     <div>{quickStats?.avgBodyweight ?? "N/A"}<span> {quickStats?.avgBodyweight != null ? " lbs" : ""} </span></div> */}
+            {/* </div> */}
+            {/*     <div className="flex sm:flex-col gap-2"> */}
+            {/*         <div>Avg Calories:</div> */}
+            {/*         <div>{quickStats?.avgCalories ?? "N/A"}<span> {quickStats?.avgCalories != null ? " lbs" : ""} </span></div> */}
+            {/*     </div> */}
+            {/* </div> */}
+
+            <div className="flex flex-col gap-6">
+                {/* Quickstats Section */}
+                <div className="dashboard-section">
+                    <h2 className="text-lg font-semibold mb-2">Quick Stats</h2>
+                    {/* Mobile: 2x2 grid; Desktop: flex row */}
+                    <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-row sm:gap-6 flex-1">
+
+                        <div className="dashboard-section-1 flex items-center gap-3 p-4 flex-1">
+                            <Scale className="text-blue-500 w-6 h-6" />
+                            <div>
+                                <h3 className="text-sm font-semibold">Current Weight</h3>
+                                <p className="text-lg font-medium">175 lbs</p>
+                                <p className="text-sm font-light text-gray-500">as of Oct 10, 2025</p>
+                            </div>
+                        </div>
+
+                        <div className="dashboard-section-1 flex items-center gap-3 p-4 flex-1">
+                            <TrendingUp className="text-green-500 w-6 h-6" />
+                            <div>
+                                <h3 className="text-sm font-semibold">Avg Weight</h3>
+                                <p className="text-lg font-medium">174.3 lbs</p>
+                                <p className="text-sm font-light text-gray-500">for the last 7 days</p>
+                            </div>
+                        </div>
+
+
+                        <div className="dashboard-section-1 flex items-center gap-3 p-4 flex-1">
+                            <Flame className="text-orange-500 w-6 h-6" />
+                            <div>
+                                <h3 className="text-sm font-semibold">Today's Calories</h3>
+                                <p className="text-lg font-medium">2,300 kcal</p>
+                            </div>
+                        </div>
+
+                        <div className="dashboard-section-1 flex items-center gap-3 p-4 flex-1">
+                            <Drumstick className="text-purple-500 w-6 h-6" />
+                            <div>
+                                <h3 className="text-sm font-semibold">Today's Protein</h3>
+                                <p className="text-lg font-medium">140g</p>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
-                <div className="dashboard-section-1 h-70 w-4/10">Goal progress</div>
+
+                {/* Goals Section */}
+                <div className="dashboard-section">
+                    <h2 className="text-lg font-semibold mb-2">Goals</h2>
+                    <div className="dashboard-section flex flex-col gap-4 sm:flex-row sm:gap-6">
+                        {/* Bodyweight Goal */}
+                        <div className="dashboard-section-1 flex flex-col flex-1 p-4">
+                            <h3 className="text-lg font-medium mb-1">Bodyweight Goal</h3>
+                            <p className="text-sm text-gray-500 mb-2">Goal: 190 lbs</p>
+                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                <div className="bg-blue-500 h-full w-[60%]" />
+                            </div>
+                            <p className="text-xs mt-1 text-gray-600">+5 lbs gained / 5 lbs left</p>
+                        </div>
+
+                        {/* Daily Calories Goal */}
+                        <div className="dashboard-section-1 flex flex-col flex-1 p-4">
+                            <h3 className="text-lg font-medium mb-3">Daily Calorie Goal</h3>
+                            <div className="flex justify-between items-center">
+                                <div className="w-35 flex items-center ml-5">
+                                    <CircularProgressbarWithChildren minValue={0} maxValue={2500} value={2150}>
+                                        <div style={{ fontSize: 12, marginTop: -5 }}>
+                                            <strong>2150 kcal</strong>
+                                        </div>
+                                    </CircularProgressbarWithChildren>
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex gap-3">
+                                        <Flag className="text-blue-500 w-6 h-6" />
+                                        <div>
+                                            <h3 className="text-sm font-semibold">Goal</h3>
+                                            <p className="text-lg font-medium">2500</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Utensils className="text-blue-500 w-6 h-6" />
+                                        <div>
+                                            <h3 className="text-sm font-semibold">Remaining</h3>
+                                            <p className="text-lg font-medium">150</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Exercise Goal */}
+                        <div className="dashboard-section-1 flex flex-col flex-1 p-4">
+                            <h3 className="text-lg font-medium mb-1">Exercise Goal</h3>
+                            <p className="text-sm text-gray-500 mb-2">Bench 225 × 1</p>
+                            <p className="text-xs text-gray-600">Closest: 205 × 3 (est. 230)</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Add Goals Button */}
+                {/* <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 mt-2 self-start"> */}
+                {/*     Add Goals */}
+                {/* </button> */}
+
             </div>
-            <div className="flex justify-center text-xl mt-4 ml-4 mb-2">Quick Stats</div>
 
-            <div className="flex flex-col sm:flex-row sm:justify-around px-4 py-3 text-md w-full rounded-lg">
-                {/* weight */}
-                <div className="flex sm:flex-col gap-2">
-                    <div>Current Weight:</div>
-                    <div>{quickStats?.currentBodyweight ?? "N/A"}<span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span></div>
-                </div>
+            <div className="flex flex-col gap-6 ">
+                <div className="dashboard-section">
+                    <h2 className="text-lg font-semibold mb-2">Progress and Analysis</h2>
+                    <div className="flex flex-col lg:flex-row justify-center gap-6">
+                        {/* <BodyweightChart logs={logs} /> */}
+                        <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
 
-                <div className="flex sm:flex-col gap-2">
-                    <div>Avg Weight:</div>
-                    <div>{quickStats?.avgBodyweight ?? "N/A"}<span> {quickStats?.avgBodyweight != null ? " lbs" : ""} </span></div>
-                </div>
 
-                {/* cals */}
-                <div className="flex sm:flex-col gap-2">
-                    <div>Avg Calories:</div>
-                    <div>{quickStats?.avgCalories ?? "N/A"}<span> {quickStats?.avgCalories != null ? " lbs" : ""} </span></div>
+                        <div className="dashboard-section-1 w-5/10 p-4">
+                            AI Analysis of bodyweight and exercise progress.
+                            Have some AI related image, and a big button and header
+                            saying click to analyze results.
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row justify-center gap-6">
-                {/* <BodyweightChart logs={logs} /> */}
-                <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
-                <div className="dashboard-section-1 w-5/10">
-                    AI Analysis of bodyweight and exercise progress.
-                    Have some AI related image, and a big button and header
-                    saying click to analyze results.
-                </div>
-            </div>
+            {/* <div className="flex flex-col lg:flex-row justify-center gap-6"> */}
+            {/*     <div className="dashboard-section-1 w-4/10 h-100"> */}
+            {/*         table carousel of exercise logs */}
+            {/*         one at a time */}
+            {/*     </div> */}
+            {/*     <div className="dashboard-section-1 w-6/10"> */}
+            {/*         daily calorie chart over the past 7 days */}
+            {/*         or some other bar chart. */}
+            {/*     </div> */}
+            {/* </div> */}
 
-            <div className="flex flex-col lg:flex-row justify-center gap-6">
-                <div className="dashboard-section-1 w-4/10 h-100">
-                    table carousel of exercise logs
-                    one at a time
-                </div>
-                <div className="dashboard-section-1 w-6/10">
-                    daily calorie chart over the past 7 days
-                    or some other bar chart.
-                </div>
-            </div>
-
-        </div>
+        </div >
     );
 }

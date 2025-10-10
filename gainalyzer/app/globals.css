@@ -540,18 +540,47 @@ input[disabled] {
     background-color: var(--exercise-card-input)
 }
 
+/* .dashboard-section-1 { */
+/*     background-color: var(--dashboard-section-primary); */
+/*     border-radius: 8px; */
+/*     border-color: var(--border); */
+/*     border-width: 1px; */
+/* } */
+
+/* .dashboard-section-2 { */
+/*     background-color: var(--dashboard-section-secondary); */
+/*     border-radius: 8px; */
+/*     border-color: var(--border); */
+/*     border-width: 1px; */
+/* } */
+
 .dashboard-section-1 {
     background-color: var(--dashboard-section-primary);
-    border-radius: 4px;
-    border-color: var(--border);
-    border-width: 1px;
+    border-radius: 12px;
+    /* slightly softer corners */
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    /* soft shadow for depth */
+    /* internal breathing room */
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-section-1:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .dashboard-section-2 {
     background-color: var(--dashboard-section-secondary);
-    border-radius: 4px;
-    border-color: var(--border);
-    border-width: 1px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-section-2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* .exercise-select { */
@@ -561,7 +590,8 @@ input[disabled] {
 
 select {
     background-color: var(--dashboard-section-primary);
-    border-color: oklch(0.922 0 0);
+    border-color: var(--select-border);
+    outline: none;
 }
 
 option {
@@ -614,6 +644,7 @@ option:hover {
     --exercise-card-input: oklch(0.97 0.00 0);
     --dashboard-section-primary: oklch(0.985 0 0);
     --dashboard-section-secondary: oklch(0.97 0 0);
+    --select-border: oklch(0.922 0 0);
 }
 
 .dark {
@@ -668,4 +699,5 @@ option:hover {
     --exercise-card-input: oklch(0.269 0.00 0);
     --dashboard-section-primary: oklch(0.205 0 0);
     --dashboard-section-secondary: oklch(0.269 0 0);
+    --select-border: oklch(0.3211 0 0);
 }

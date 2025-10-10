@@ -191,7 +191,22 @@ into a type that we can easily plot.
 * Started the new welcome section.
 * Fixed the x axis ticks on chart not being sparse enough
 
+## 10-08:
+* I did some stuff but I forgot...
+* Also had to set up dev environment for windows since I got new pc and couldn't access my linux partition
+
+## 10-09:
+* worked on improving the dashboard layout once more
+
+## 10-10:
+* Settled on a dashboard setup, worked on getting that done and looking nice
+* got most of things done, need to implement actually dynamically loading the data
+
+
 ### todo:
+* Have a fixed aspect ratio for the exercise bw chart so it doesn't get elongated height wise. Should always be wider.
+* idk. Move the isMObile check from the exercisebodyweight chart to the dashboard page and do pass it down as props to everything else.
+* Make the navbar be a side panel like gpt app to match desktop on mobile
 * Redo the exercise and date range selects to be better looking and limit how many options show at once on exercise select.
 * Fix the x axis ticks. They're not changing for some reason.
 * Fix the "All" on the first bodyweight chart
@@ -201,7 +216,7 @@ into a type that we can easily plot.
 * Create an exercise selector dropdown that pulls from the users exercises, default to the most recently added
 , and show blank or just "exercise" if there's none.
 * Need to Split the quick stats into (weight /cal) bubbles and have images in each (scale/food icons)
-* Move all log colors down one. Darker looks better
+* Move all log colors down one. Darker looks better. Or invert to where we have lighter background than the section cards
 * On the quick stats have a hover popup that says that the avg is taken over the last 7 days for weight/cal
 * Start on Dashboard. Get a graph up for the bodyweight or something
     - app/dashboard/page should be server component, insert a separate client dashboard component within it.
