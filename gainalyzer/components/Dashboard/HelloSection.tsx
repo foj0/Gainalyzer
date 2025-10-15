@@ -7,8 +7,8 @@ export default function HelloSection({ fullName }: { fullName: string }) {
     return (
         <>
             <div className="flex flex-col justify-center items-center gap-2">
-                <div className="text-3xl text-center">
-                    Welcome <span className="font-bold">{fullName}</span> 👋
+                <div className="text-3xl text-center flex flex-col md:flex-row">
+                    Welcome&nbsp;<span className="font-bold">{fullName}</span> &nbsp;👋
                 </div>
                 <Link
                     href="/log"

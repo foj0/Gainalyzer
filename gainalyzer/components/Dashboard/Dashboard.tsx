@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import {
@@ -14,24 +16,27 @@ import {
 } from "recharts";
 import HelloSection from "./HelloSection";
 import ExerciseBodyweightChart from "./ExercerciseBodyweightChart";
-import { Scale, Flame, TrendingUp, Drumstick, Flag, Utensils } from "lucide-react"
+import { AiAnalysisSection } from "./AiAnalysisSection";
+import { Scale, Flame, TrendingUp, Drumstick, Flag, Utensils, Brain, Dumbbell } from "lucide-react"
 import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+
 // raw type of what supabase returns
-type SupabaseLogResult = {
-    log_date: string;
-    bodyweight: number | null;
-    calories: number | null;
-    log_exercises: {
-        weight: number | null;
-        reps: number | null;
-        notes: string | null;
-        exercises: {
-            name: string;
-        };
-    }[];
-};
+type SupabaseLogResult =
+    {
+        log_date: string;
+        bodyweight: number | null;
+        calories: number | null;
+        log_exercises: {
+            weight: number | null;
+            reps: number | null;
+            notes: string | null;
+            exercises: {
+                name: string;
+            };
+        }[];
+    };
 
 // to format the log result
 type Exercise = {
@@ -51,7 +56,9 @@ type Log = {
 type QuickStats = {
     currentBodyweight: number | null;
     avgBodyweight: number | null;
-    avgCalories: number | null;
+    calories: number | null;
+    protein: number | null;
+    date: string | null;
 }
 
 export default function Dashboard() {
@@ -63,6 +70,7 @@ export default function Dashboard() {
     const [userExercises, setUserExercises] = useState<{ id: string, name: string }[] | null>(null);
     const [fullName, setFullName] = useState<string>("");
 
+    // fetch user
     useEffect(() => {
         async function fetchUser() {
             const { data: { user } } = await supabase.auth.getUser();
@@ -77,6 +85,7 @@ export default function Dashboard() {
 
     }, [supabase])
 
+    // get users exercises to pass into chart for selection
     useEffect(() => {
         async function fetchUserExercises() {
             if (!user) return;
@@ -92,9 +101,10 @@ export default function Dashboard() {
         }
 
         fetchUserExercises();
-        console.log(user);
+        //console.log(user);
     }, [supabase, user])
 
+    // get all of the users logs and reformat them to our Log type
     useEffect(() => {
         async function fetchLogs() {
             if (!user) return;
@@ -124,7 +134,6 @@ export default function Dashboard() {
                 return;
             } else if (userLogs) {
                 // console.log("Raw logs", userLogs)
-
                 const formattedLogs: Log[] = userLogs.map((log) => (
                     {
                         log_date: log.log_date,
@@ -188,11 +197,29 @@ export default function Dashboard() {
         };
     }
 
+    function formatDate(date: Date | undefined) {
+        const d = date ?? new Date(); // fallback to today's date if undefined
+        const months = [
+            "Jan", "Feb", "Mar",
+            "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep",
+            "Oct", "Nov", "Dec"
+        ];
+        const day = d.getDate();
+        const month = months[d.getMonth()];
+        const year = d.getFullYear();
+        return `${month} ${day}, ${year}`;
+    }
+
+    // pull info from the most recent log and update quick stats section
     useEffect(() => {
         let mostRecentLog: Log | undefined;
         let currentBodyweight = null;
         let avgBodyweight = null;
-        let avgCalories = null;
+        let calories = null;
+        let protein = null;
+        let date = null;
+        let formattedDate = null;
 
 
         if (logs && logs.length > 0) {
@@ -200,20 +227,27 @@ export default function Dashboard() {
             if (mostRecentLog.bodyweight) {
                 currentBodyweight = mostRecentLog.bodyweight;
             }
+            if (mostRecentLog.log_date) {
+                date = new Date(mostRecentLog.log_date);
+                formattedDate = formatDate(date)
+            }
 
             const averages = calculateAverageBWCals(logs);
             avgBodyweight = averages.avgBW;
-            avgCalories = averages.avgCal;
+            calories = averages.avgCal; // TODO: update to just todays calories
         }
         setQuickStats(
             {
                 currentBodyweight: currentBodyweight ?? null,
                 avgBodyweight: avgBodyweight ?? null,
-                avgCalories: avgCalories ?? null
+                calories: calories ?? null,
+                protein: protein ?? null,
+                date: formattedDate ?? null,
             }
         )
 
     }, [logs])
+
 
     if (loading) return <p>Loading...</p>;
     return (
@@ -239,10 +273,10 @@ export default function Dashboard() {
             {/*     </div> */}
             {/* </div> */}
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
                 {/* Quickstats Section */}
                 <div className="dashboard-section">
-                    <h2 className="text-lg font-semibold mb-2">Quick Stats</h2>
+                    <h2 className="text-lg font-semibold mb-1">Today's Stats</h2>
                     {/* Mobile: 2x2 grid; Desktop: flex row */}
                     <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-row sm:gap-6 flex-1">
 
@@ -250,8 +284,16 @@ export default function Dashboard() {
                             <Scale className="text-blue-500 w-6 h-6" />
                             <div>
                                 <h3 className="text-sm font-semibold">Current Weight</h3>
-                                <p className="text-lg font-medium">175 lbs</p>
-                                <p className="text-sm font-light text-gray-500">as of Oct 10, 2025</p>
+                                <p className="text-lg font-medium">
+                                    {quickStats?.currentBodyweight ?? "N/A"}
+                                    <span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span>
+                                </p>
+                                {
+                                    quickStats?.currentBodyweight != null ?
+                                        <p className="text-sm font-light text-gray-500">as of {quickStats?.date}</p>
+                                        :
+                                        <></>
+                                }
                             </div>
                         </div>
 
@@ -259,8 +301,16 @@ export default function Dashboard() {
                             <TrendingUp className="text-green-500 w-6 h-6" />
                             <div>
                                 <h3 className="text-sm font-semibold">Avg Weight</h3>
-                                <p className="text-lg font-medium">174.3 lbs</p>
-                                <p className="text-sm font-light text-gray-500">for the last 7 days</p>
+                                <p className="text-lg font-medium">
+                                    {quickStats?.avgBodyweight ?? "N/A"}
+                                    <span> {quickStats?.avgBodyweight != null ? "lbs" : ""} </span>
+                                </p>
+                                {
+                                    quickStats?.avgBodyweight != null ?
+                                        <p className="text-sm font-light text-gray-500">last 7 days</p>
+                                        :
+                                        <p className="text-sm font-light text-gray-500">missing log info</p>
+                                }
                             </div>
                         </div>
 
@@ -269,7 +319,16 @@ export default function Dashboard() {
                             <Flame className="text-orange-500 w-6 h-6" />
                             <div>
                                 <h3 className="text-sm font-semibold">Today's Calories</h3>
-                                <p className="text-lg font-medium">2,300 kcal</p>
+                                <p className="text-lg font-medium">
+                                    {quickStats?.calories ?? "N/A"}
+                                    <span> {quickStats?.calories != null ? "kcal" : ""} </span>
+                                </p>
+                                {
+                                    quickStats?.calories != null ?
+                                        <p className="text-sm font-light text-gray-500">last 7 days</p>
+                                        :
+                                        <p className="text-sm font-light text-gray-500">missing log info</p>
+                                }
                             </div>
                         </div>
 
@@ -277,17 +336,35 @@ export default function Dashboard() {
                             <Drumstick className="text-purple-500 w-6 h-6" />
                             <div>
                                 <h3 className="text-sm font-semibold">Today's Protein</h3>
-                                <p className="text-lg font-medium">140g</p>
+                                <p className="text-lg font-medium">
+                                    {quickStats?.protein ?? "N/A"}
+                                    <span> {quickStats?.protein != null ? "g" : ""} </span>
+                                </p>
+                                {
+                                    quickStats?.protein == null ?
+                                        <p className="text-sm font-light text-gray-500">missing log info</p>
+                                        :
+                                        <></>
+                                }
                             </div>
                         </div>
 
                     </div>
-
                 </div>
+
 
                 {/* Goals Section */}
                 <div className="dashboard-section">
-                    <h2 className="text-lg font-semibold mb-2">Goals</h2>
+
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-lg font-semibold mb-1">Goals</h2>
+                        <Link
+                            href="/goals"
+                            className="px-2 rounde d-md underline hover:cursor-pointer"
+                        >
+                            Set goals
+                        </Link>
+                    </div>
                     <div className="dashboard-section flex flex-col gap-4 sm:flex-row sm:gap-6">
                         {/* Bodyweight Goal */}
                         <div className="dashboard-section-1 flex flex-col flex-1 p-4">
@@ -302,7 +379,7 @@ export default function Dashboard() {
                         {/* Daily Calories Goal */}
                         <div className="dashboard-section-1 flex flex-col flex-1 p-4">
                             <h3 className="text-lg font-medium mb-3">Daily Calorie Goal</h3>
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-center items-center gap-8">
                                 <div className="w-35 flex items-center ml-5">
                                     <CircularProgressbarWithChildren minValue={0} maxValue={2500} value={2150}>
                                         <div style={{ fontSize: 12, marginTop: -5 }}>
@@ -336,44 +413,42 @@ export default function Dashboard() {
                             <p className="text-xs text-gray-600">Closest: 205 × 3 (est. 230)</p>
                         </div>
                     </div>
+
+                    {/*TODO: we have 3 options for goals, weight, cals, strength. If any of these is not set, replace the card
+                with a grayed out card saying to set goal and a button to redirect to there*/}
+                    {/* Add Goals Button */}
+                    {/* <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 mt-2 self-start"> */}
+                    {/*     Add Goals */}
+                    {/* </button> */}
+
                 </div>
 
-                {/* Add Goals Button */}
-                {/* <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 mt-2 self-start"> */}
-                {/*     Add Goals */}
-                {/* </button> */}
+                {/*Chart and analysis section*/}
+                <div className="flex flex-col gap-6 ">
+                    <div className="dashboard-section">
+                        <h2 className="text-lg font-semibold mb-1">Progress and Analysis</h2>
+                        <div className="flex flex-col lg:flex-row justify-center gap-6">
+                            {/* <BodyweightChart logs={logs} /> */}
+                            <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
 
-            </div>
+                            <AiAnalysisSection selectedExercise={"Bench Press"} />
 
-            <div className="flex flex-col gap-6 ">
-                <div className="dashboard-section">
-                    <h2 className="text-lg font-semibold mb-2">Progress and Analysis</h2>
-                    <div className="flex flex-col lg:flex-row justify-center gap-6">
-                        {/* <BodyweightChart logs={logs} /> */}
-                        <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
-
-
-                        <div className="dashboard-section-1 w-5/10 p-4">
-                            AI Analysis of bodyweight and exercise progress.
-                            Have some AI related image, and a big button and header
-                            saying click to analyze results.
                         </div>
-
                     </div>
                 </div>
+
+                {/* <div className="flex flex-col lg:flex-row justify-center gap-6"> */}
+                {/*     <div className="dashboard-section-1 w-4/10 h-100"> */}
+                {/*         table carousel of exercise logs */}
+                {/*         one at a time */}
+                {/*     </div> */}
+                {/*     <div className="dashboard-section-1 w-6/10"> */}
+                {/*         daily calorie chart over the past 7 days */}
+                {/*         or some other bar chart. */}
+                {/*     </div> */}
+                {/* </div> */}
+
             </div>
-
-            {/* <div className="flex flex-col lg:flex-row justify-center gap-6"> */}
-            {/*     <div className="dashboard-section-1 w-4/10 h-100"> */}
-            {/*         table carousel of exercise logs */}
-            {/*         one at a time */}
-            {/*     </div> */}
-            {/*     <div className="dashboard-section-1 w-6/10"> */}
-            {/*         daily calorie chart over the past 7 days */}
-            {/*         or some other bar chart. */}
-            {/*     </div> */}
-            {/* </div> */}
-
-        </div >
+        </div>
     );
 }

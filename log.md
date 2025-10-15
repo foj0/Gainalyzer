@@ -202,8 +202,20 @@ into a type that we can easily plot.
 * Settled on a dashboard setup, worked on getting that done and looking nice
 * got most of things done, need to implement actually dynamically loading the data
 
+## 10-13:
+* Got some boiler plate stuff for the AI analyze section
+* Started actually pulling data for the quick stats section
+
+## 10-14:
+
 
 ### todo:
+* TODO: we have 3 options for goals, weight, cals, strength. If any of these is not set, replace the card
+    with a grayed out card saying to set goal and a button to redirect to there
+* Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.
+    would help fill up the screen a little more. So don't put the pfp thing at the bottom of the side panel like i was thinking.
+* Make an exercises page where you can select an exercise and it displays a table of all your logs for that specific exercise
+and a graph for it.
 * Have a fixed aspect ratio for the exercise bw chart so it doesn't get elongated height wise. Should always be wider.
 * idk. Move the isMObile check from the exercisebodyweight chart to the dashboard page and do pass it down as props to everything else.
 * Make the navbar be a side panel like gpt app to match desktop on mobile
@@ -227,7 +239,9 @@ into a type that we can easily plot.
 and delete the cache after some time. Or does supabase already do this?
 * Look into why logout takes so long. Maybe just redirect to login page first while it loads the logout
 * Consider disabling the log button until changes are made.
-* add a little profile marker with pfp and email/full name at bottom by settings on sidebar
 * Do I need to have a allow cookies thing? Look into when this is needed.
 * For the log page, look into reducing the number of auth reqs. Is there a way to
 do it once and keep that for the rest of the session?
+* Maybe add a little chart thingy that highlights days you've logged this week to dashboard.
+So we can have like 7 circles, sun - sat, and days that you did log are filled in green or lit up,
+otherwise they are grayed out.

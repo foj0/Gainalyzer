@@ -245,7 +245,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
             <div className="flex justify-center">
                 <h2 className="text-xl font-bold m-2">Weight & Strength</h2>
             </div>
-            <div className="flex justify-end items-center mb-4">
+            <div className="flex justify-between items-center mb-4 mx-6">
                 <select
                     value={selectedExercise}
                     onChange={(e) => setSelectedExercise(e.target.value as string)}
