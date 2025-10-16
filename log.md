@@ -213,6 +213,11 @@ into a type that we can easily plot.
 * Goal section saving.
 * Added goals supabase table
 
+## 10-16:
+* Finished goals section.
+* added more edge cases for clearing goals and stuff like that
+* got dashboard to pull users's bw goal
+
 
 
 ### todo:
