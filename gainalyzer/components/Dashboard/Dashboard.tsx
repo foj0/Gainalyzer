@@ -73,6 +73,7 @@ export default function Dashboard() {
     // info for goals
     const [bodyweightStart, setBodyweightStart] = useState("");
     const [bodyweightGoal, setBodyweightGoal] = useState("");
+    const [bwProgDesc, setBwProgDesc] = useState("");
     const [calorieGoal, setCalorieGoal] = useState("");
     const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
     const [weightGoal, setWeightGoal] = useState("");
@@ -94,54 +95,6 @@ export default function Dashboard() {
 
     }, [supabase])
 
-    // get users exercises to pass into chart for selection
-    useEffect(() => {
-        async function fetchUserExercises() {
-            if (!user) return;
-
-            const response = await supabase
-                .from("exercises")
-                .select("id, name")
-                .eq("user_id", user.id)
-
-            const exercises = response.data;
-            setUserExercises(exercises);
-        }
-
-        async function fetchUserGoals() {
-            if (!user) return;
-
-            const { data: goals, error } = await supabase
-                .from("goals")
-                .select("type, target_value, exercise_id, target_weight, target_reps, start_bodyweight")
-                .eq("user_id", user.id)
-
-            if (error) {
-                console.error("Error fetching goals:", error.message);
-                return;
-            }
-
-            const goalMap = new Map();
-            if (goals) {
-                goals.forEach((goal) => {
-                    goalMap.set(goal.type, goal);
-                });
-
-                goalsRef.current = goalMap
-
-
-                setBodyweightStart(goalMap.get("bodyweight")?.start_bodyweight ?? "");
-                setBodyweightGoal(goalMap.get("bodyweight")?.target_value ?? "");
-                setCalorieGoal(goalMap.get("calories")?.target_value ?? "");
-                setSelectedExerciseId(goalMap.get("strength")?.exercise_id);
-                setWeightGoal(goalMap.get("strength")?.target_weight ?? "");
-                setRepsGoal(goalMap.get("strength")?.target_reps ?? "");
-            }
-        }
-
-        fetchUserExercises();
-        fetchUserGoals();
-    }, [supabase, user])
 
     // get all of the users logs and reformat them to our Log type
     useEffect(() => {
@@ -283,8 +236,77 @@ export default function Dashboard() {
                 date: formattedDate ?? null,
             }
         )
+        console.log("quickstats current bw: ", quickStats?.currentBodyweight)
+        console.log("raw cbw", currentBodyweight)
 
     }, [logs])
+
+    // get users exercises to pass into chart for selection
+    useEffect(() => {
+        async function fetchUserExercises() {
+            if (!user) return;
+
+            const response = await supabase
+                .from("exercises")
+                .select("id, name")
+                .eq("user_id", user.id)
+
+            const exercises = response.data;
+            setUserExercises(exercises);
+        }
+
+        fetchUserExercises();
+    }, [supabase, user])
+
+    useEffect(() => {
+        async function fetchUserGoals() {
+            if (!user) return;
+
+            const { data: goals, error } = await supabase
+                .from("goals")
+                .select("type, target_value, exercise_id, target_weight, target_reps, start_bodyweight")
+                .eq("user_id", user.id)
+
+            if (error) {
+                console.error("Error fetching goals:", error.message);
+                return;
+            }
+
+            if (goals) {
+                const goalMap = new Map();
+                goals.forEach((goal) => {
+                    goalMap.set(goal.type, goal);
+                });
+
+                goalsRef.current = goalMap
+                console.log("goalmap", goalMap);
+
+
+                const bwStart = goalMap.get("bodyweight")?.start_bodyweight ?? "";
+                const bwGoal = goalMap.get("bodyweight")?.target_value ?? "";
+                setBodyweightStart(bwStart);
+                setBodyweightGoal(bwGoal);
+                setCalorieGoal(goalMap.get("calories")?.target_value ?? "");
+                setSelectedExerciseId(goalMap.get("strength")?.exercise_id);
+                setWeightGoal(goalMap.get("strength")?.target_weight ?? "");
+                setRepsGoal(goalMap.get("strength")?.target_reps ?? "");
+
+                if (bwStart != "" && bwGoal != "") {
+                    const bodyweightProgress = Number(bwStart) - Number(quickStats?.currentBodyweight);
+                    console.log("currentBW: ", quickStats?.currentBodyweight);
+                    let bodyweightProgressDesc = ""
+                    if (bodyweightProgress <= 0) {
+                        bodyweightProgressDesc = `+${Math.abs(bodyweightProgress).toFixed(1)} lbs from starting weight`
+                    } else {
+                        bodyweightProgressDesc = `-${Math.abs(bodyweightProgress).toFixed(1)} lbs from starting weight`
+                    }
+                    setBwProgDesc(bodyweightProgressDesc);
+                }
+            }
+        }
+
+        fetchUserGoals();
+    }, [user, quickStats])
 
 
     if (loading) return <p>Loading...</p>;
@@ -389,12 +411,20 @@ export default function Dashboard() {
 
                         {/* Bodyweight Goal */}
                         <div className="dashboard-section-1 flex flex-col flex-1 p-4">
-                            <h3 className="text-lg font-medium mb-1">Bodyweight Goal</h3>
-                            <p className="text-sm text-gray-500 mb-2">Goal: 190 lbs</p>
-                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                <div className="bg-blue-500 h-full w-[60%]" />
-                            </div>
-                            <p className="text-xs mt-1 text-gray-600">+5 lbs gained / 5 lbs left</p>
+                            {goalsRef.current.get("bodyweight").target_value != null ?
+                                <div>
+                                    <h3 className="text-lg font-medium mb-2">Bodyweight Goal</h3>
+                                    <p className="text-md mb-2">Start: {bodyweightStart} lbs</p>
+                                    <p className="text-md mb-2">Goal: {bodyweightGoal} lbs</p>
+                                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                        <div className="bg-blue-500 h-full w-[60%]" />
+                                    </div>
+                                    <p className="mt-1 text-gray-400">{bwProgDesc}</p>
+                                    <p className="mt-1 text-gray-400">{(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} lbs to go!</p>
+                                </div>
+                                :
+                                <></>
+                            }
                         </div>
 
                         {/* Daily Calories Goal */}
