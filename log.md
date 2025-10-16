@@ -207,6 +207,12 @@ into a type that we can easily plot.
 * Started actually pulling data for the quick stats section
 
 ## 10-14:
+* started goal section
+
+## 10-15:
+* Goal section saving.
+* Added goals supabase table
+
 
 
 ### todo:

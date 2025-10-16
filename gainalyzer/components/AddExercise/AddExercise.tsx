@@ -48,7 +48,7 @@ export const AddExercise = ({ onAdd }: { onAdd: (exercise: ExerciseOption) => vo
                 .order("name", { ascending: true });
 
             if (error) {
-                console.error(error)
+                console.error(error);
             } else if (data) {
                 setExercises((data as any).map((ex: any) => ({
                     id: ex.id,
