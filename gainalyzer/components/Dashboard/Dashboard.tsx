@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
@@ -63,12 +63,21 @@ type QuickStats = {
 
 export default function Dashboard() {
     const supabase = createClient();
-    const [logs, setLogs] = useState<Log[]>([]);
     const [loading, setLoading] = useState(true);
-    const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
     const [user, setUser] = useState<User | null>(null);
-    const [userExercises, setUserExercises] = useState<{ id: string, name: string }[] | null>(null);
     const [fullName, setFullName] = useState<string>("");
+    const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
+    const [logs, setLogs] = useState<Log[]>([]);
+    const [userExercises, setUserExercises] = useState<{ id: string, name: string }[] | null>(null);
+
+    // info for goals
+    const [bodyweightStart, setBodyweightStart] = useState("");
+    const [bodyweightGoal, setBodyweightGoal] = useState("");
+    const [calorieGoal, setCalorieGoal] = useState("");
+    const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
+    const [weightGoal, setWeightGoal] = useState("");
+    const [repsGoal, setRepsGoal] = useState("");
+    const goalsRef = useRef(new Map());
 
     // fetch user
     useEffect(() => {
@@ -95,13 +104,43 @@ export default function Dashboard() {
                 .select("id, name")
                 .eq("user_id", user.id)
 
-            // console.log("response", response);
             const exercises = response.data;
             setUserExercises(exercises);
         }
 
+        async function fetchUserGoals() {
+            if (!user) return;
+
+            const { data: goals, error } = await supabase
+                .from("goals")
+                .select("type, target_value, exercise_id, target_weight, target_reps, start_bodyweight")
+                .eq("user_id", user.id)
+
+            if (error) {
+                console.error("Error fetching goals:", error.message);
+                return;
+            }
+
+            const goalMap = new Map();
+            if (goals) {
+                goals.forEach((goal) => {
+                    goalMap.set(goal.type, goal);
+                });
+
+                goalsRef.current = goalMap
+
+
+                setBodyweightStart(goalMap.get("bodyweight")?.start_bodyweight ?? "");
+                setBodyweightGoal(goalMap.get("bodyweight")?.target_value ?? "");
+                setCalorieGoal(goalMap.get("calories")?.target_value ?? "");
+                setSelectedExerciseId(goalMap.get("strength")?.exercise_id);
+                setWeightGoal(goalMap.get("strength")?.target_weight ?? "");
+                setRepsGoal(goalMap.get("strength")?.target_reps ?? "");
+            }
+        }
+
         fetchUserExercises();
-        //console.log(user);
+        fetchUserGoals();
     }, [supabase, user])
 
     // get all of the users logs and reformat them to our Log type
@@ -133,7 +172,6 @@ export default function Dashboard() {
                 console.error("Error fetching log:", error);
                 return;
             } else if (userLogs) {
-                // console.log("Raw logs", userLogs)
                 const formattedLogs: Log[] = userLogs.map((log) => (
                     {
                         log_date: log.log_date,
@@ -255,24 +293,6 @@ export default function Dashboard() {
 
             <HelloSection fullName={fullName} />
 
-
-            {/* <div className="flex justify-center text-xl mt-4 ml-4 mb-2">Quick Stats</div> */}
-            {/* <div className="flex flex-col sm:flex-row sm:justify-around px-4 py-3 text-md w-full rounded-lg"> */}
-            {/* <div className="flex sm:flex-col gap-2"> */}
-            {/*     <div>Current Weight:</div> */}
-            {/*     <div>{quickStats?.currentBodyweight ?? "N/A"}<span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span></div> */}
-            {/* </div> */}
-
-            {/* <div className="flex sm:flex-col gap-2"> */}
-            {/*     <div>Avg Weight:</div> */}
-            {/*     <div>{quickStats?.avgBodyweight ?? "N/A"}<span> {quickStats?.avgBodyweight != null ? " lbs" : ""} </span></div> */}
-            {/* </div> */}
-            {/*     <div className="flex sm:flex-col gap-2"> */}
-            {/*         <div>Avg Calories:</div> */}
-            {/*         <div>{quickStats?.avgCalories ?? "N/A"}<span> {quickStats?.avgCalories != null ? " lbs" : ""} </span></div> */}
-            {/*     </div> */}
-            {/* </div> */}
-
             <div className="flex flex-col gap-4">
                 {/* Quickstats Section */}
                 <div className="dashboard-section">
@@ -366,6 +386,7 @@ export default function Dashboard() {
                         </Link>
                     </div>
                     <div className="dashboard-section flex flex-col gap-4 sm:flex-row sm:gap-6">
+
                         {/* Bodyweight Goal */}
                         <div className="dashboard-section-1 flex flex-col flex-1 p-4">
                             <h3 className="text-lg font-medium mb-1">Bodyweight Goal</h3>
