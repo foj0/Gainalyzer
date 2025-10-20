@@ -61,6 +61,12 @@ type QuickStats = {
     date: string | null;
 }
 
+type ProgressBarProps = {
+    value: number; // 0 to 100
+    label?: string;
+}
+
+
 export default function Dashboard() {
     const supabase = createClient();
     const [loading, setLoading] = useState(true);
@@ -309,6 +315,23 @@ export default function Dashboard() {
     }, [user, quickStats])
 
 
+    function ProgressBar({ value, label }: ProgressBarProps) {
+        console.log("value: ", value)
+        const val = value * 100;
+        console.log("val: ", val)
+        return (
+            <div className="w-full bg-gray-800 rounded-full h-4 relative">
+                <div className={`bg-blue-500 rounded-full h-4`}
+                    style={{ width: `${val}%` }}
+                >
+                </div>
+                <span className="absolute text-xs top-0 right-5">{label} lbs</span>
+
+            </div >
+        );
+    }
+
+
     if (loading) return <p>Loading...</p>;
     return (
         <div className="flex flex-col w-full gap-6">
@@ -414,13 +437,13 @@ export default function Dashboard() {
                             {goalsRef.current.get("bodyweight").target_value != null ?
                                 <div>
                                     <h3 className="text-lg font-medium mb-2">Bodyweight Goal</h3>
-                                    <p className="text-md mb-2">Start: {bodyweightStart} lbs</p>
-                                    <p className="text-md mb-2">Goal: {bodyweightGoal} lbs</p>
-                                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                        <div className="bg-blue-500 h-full w-[60%]" />
+                                    <div className="flex justify-between">
+                                        <p className="text-sm mb-2">Start: {bodyweightStart} lbs</p>
+                                        <p className="text-sm mb-2">Goal: {bodyweightGoal} lbs</p>
                                     </div>
-                                    <p className="mt-1 text-gray-400">{bwProgDesc}</p>
-                                    <p className="mt-1 text-gray-400">{(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} lbs to go!</p>
+                                    <ProgressBar value={(Number(quickStats?.currentBodyweight) / Number(bodyweightGoal))} label={Number(quickStats?.currentBodyweight).toFixed(1)} />
+                                    <p className="text-sm mt-1 text-gray-400">{bwProgDesc}</p>
+                                    <p className="text-sm mt-1 text-gray-400">{(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} lbs to go!</p>
                                 </div>
                                 :
                                 <></>
