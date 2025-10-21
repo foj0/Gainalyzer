@@ -218,6 +218,10 @@ into a type that we can easily plot.
 * added more edge cases for clearing goals and stuff like that
 * got dashboard to pull users's bw goal
 
+## 10-20:
+* Finished the goal section (at least the part when we have a valid goal set)
+* Starting the empty goal set for when goals still haven't been set.
+
 
 
 ### todo:

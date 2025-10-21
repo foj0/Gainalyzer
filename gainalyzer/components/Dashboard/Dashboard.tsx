@@ -23,20 +23,19 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 // raw type of what supabase returns
-type SupabaseLogResult =
-    {
-        log_date: string;
-        bodyweight: number | null;
-        calories: number | null;
-        log_exercises: {
-            weight: number | null;
-            reps: number | null;
-            notes: string | null;
-            exercises: {
-                name: string;
-            };
-        }[];
-    };
+type SupabaseLogResult = {
+    log_date: string;
+    bodyweight: number | null;
+    calories: number | null;
+    log_exercises: {
+        weight: number | null;
+        reps: number | null;
+        notes: string | null;
+        exercises: {
+            name: string;
+        };
+    }[];
+};
 
 // to format the log result
 type Exercise = {
@@ -66,6 +65,11 @@ type ProgressBarProps = {
     label?: string;
 }
 
+type StrengthPR = {
+    ORM: number | null;
+    set: { weight: number, reps: number };
+}
+
 
 export default function Dashboard() {
     const supabase = createClient();
@@ -84,6 +88,7 @@ export default function Dashboard() {
     const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
     const [weightGoal, setWeightGoal] = useState("");
     const [repsGoal, setRepsGoal] = useState("");
+    const [strengthPR, setStrengthPR] = useState<StrengthPR | null>(null);
     const goalsRef = useRef(new Map());
 
     // fetch user
@@ -264,6 +269,29 @@ export default function Dashboard() {
         fetchUserExercises();
     }, [supabase, user])
 
+    function fetchStrengthPR() {
+        const goalExerciseName = userExercises?.find(ex => ex.id === goalsRef.current.get("strength")?.exercise_id)?.name;
+        let maxORM = null;
+        let bestSet = { weight: 0, reps: 0 };
+        for (let log of logs) {
+            for (let ex of log.exercises) {
+                let estORM
+                if (ex.name === goalExerciseName && ex.weight && ex.reps) {
+                    estORM = ex.weight / (1.0278 - 0.0278 * ex.reps);
+                    if (maxORM === null || estORM > maxORM) {
+                        maxORM = estORM;
+                        bestSet = { weight: ex.weight, reps: ex.reps };
+                    }
+                    break; // there won't be more than 1 of this exercise per log
+                }
+            }
+        }
+
+        if (maxORM != null) {
+            setStrengthPR({ ORM: maxORM, set: bestSet });
+        }
+    }
+
     useEffect(() => {
         async function fetchUserGoals() {
             if (!user) return;
@@ -312,6 +340,7 @@ export default function Dashboard() {
         }
 
         fetchUserGoals();
+        fetchStrengthPR();
     }, [user, quickStats])
 
 
@@ -434,7 +463,9 @@ export default function Dashboard() {
 
                         {/* Bodyweight Goal */}
                         <div className="dashboard-section-1 flex flex-col flex-1 p-4">
-                            {goalsRef.current.get("bodyweight").target_value != null ?
+                            {(goalsRef.current.get("bodyweight")?.target_value != null &&
+                                goalsRef.current.get("bodyweight")?.target_value != 0)
+                                ?
                                 <div>
                                     <h3 className="text-lg font-medium mb-2">Bodyweight Goal</h3>
                                     <div className="flex justify-between">
@@ -446,54 +477,178 @@ export default function Dashboard() {
                                     <p className="text-sm mt-1 text-gray-400">{(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} lbs to go!</p>
                                 </div>
                                 :
-                                <></>
+                                <div className="flex flex-1 items-center">
+                                    <p className="text-center text-gray-400">You haven't set your bodyweight goal yet</p>
+                                </div>
                             }
                         </div>
 
                         {/* Daily Calories Goal */}
                         <div className="dashboard-section-1 flex flex-col flex-1 p-4">
-                            <h3 className="text-lg font-medium mb-3">Daily Calorie Goal</h3>
-                            <div className="flex justify-center items-center gap-8">
-                                <div className="w-35 flex items-center ml-5">
-                                    <CircularProgressbarWithChildren minValue={0} maxValue={2500} value={2150}>
-                                        <div style={{ fontSize: 12, marginTop: -5 }}>
-                                            <strong>2150 kcal</strong>
+                            {(goalsRef.current.get("calories")?.target_value != null &&
+                                goalsRef.current.get("calories")?.target_value != 0)
+
+                                ?
+
+                                <>
+                                    <h3 className="text-lg font-medium mb-3">Daily Calorie Goal</h3>
+                                    <div className="flex justify-center items-center gap-8">
+                                        <div className="w-35 flex items-center ml-5">
+                                            <CircularProgressbarWithChildren minValue={0} maxValue={2500} value={2150}>
+                                                <div style={{ fontSize: 12, marginTop: -5 }}>
+                                                    <strong>2150 kcal</strong>
+                                                </div>
+                                            </CircularProgressbarWithChildren>
                                         </div>
-                                    </CircularProgressbarWithChildren>
-                                </div>
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex gap-3">
-                                        <Flag className="text-blue-500 w-6 h-6" />
-                                        <div>
-                                            <h3 className="text-sm font-semibold">Goal</h3>
-                                            <p className="text-lg font-medium">2500</p>
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex gap-3">
+                                                <Flag className="text-blue-500 w-6 h-6" />
+                                                <div>
+                                                    <h3 className="text-sm font-semibold">Goal</h3>
+                                                    <p className="text-lg font-medium">2500</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <Utensils className="text-blue-500 w-6 h-6" />
+                                                <div>
+                                                    <h3 className="text-sm font-semibold">Remaining</h3>
+                                                    <p className="text-lg font-medium">150</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-3">
-                                        <Utensils className="text-blue-500 w-6 h-6" />
-                                        <div>
-                                            <h3 className="text-sm font-semibold">Remaining</h3>
-                                            <p className="text-lg font-medium">150</p>
-                                        </div>
-                                    </div>
+                                </>
+
+                                :
+
+                                <div className="flex flex-1 items-center">
+                                    <p className="text-center text-gray-400">You haven't set your daily calorie goal yet</p>
                                 </div>
-                            </div>
+                            }
                         </div>
 
                         {/* Exercise Goal */}
-                        <div className="dashboard-section-1 flex flex-col flex-1 p-4">
-                            <h3 className="text-lg font-medium mb-1">Exercise Goal</h3>
-                            <p className="text-sm text-gray-500 mb-2">Bench 225 × 1</p>
-                            <p className="text-xs text-gray-600">Closest: 205 × 3 (est. 230)</p>
-                        </div>
-                    </div>
+                        {/* <div className="dashboard-section-1 flex flex-col flex-1 p-4"> */}
+                        {/**/}
+                        {/*     {(goalsRef.current.get("strength")?.target_weight != null && */}
+                        {/*         goalsRef.current.get("strength")?.target_weight != 0) */}
+                        {/**/}
+                        {/*         ? */}
+                        {/*         <> */}
+                        {/*             <h3 className="text-lg font-medium mb-1">Exercise Goal</h3> */}
+                        {/*             <div className="text-sm text-gray-300 mb-2"> */}
+                        {/*                 <p> */}
+                        {/*                     {userExercises?.find(ex => ex.id === goalsRef.current.get("strength")?.exercise_id)?.name} */}
+                        {/*                 </p> */}
+                        {/*                 <p> */}
+                        {/*                     {goalsRef.current.get("strength")?.target_weight} lbs x {goalsRef.current.get("strength")?.target_reps} reps */}
+                        {/*                 </p> */}
+                        {/*                 <p className="text-sm text-gray-300"> */}
+                        {/*                     Estimated Goal 1RM: <span>{(goalsRef.current.get("strength")?.target_weight / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps)).toFixed(0)} lbs</span> */}
+                        {/*                 </p> */}
+                        {/*             </div> */}
+                        {/*             <div> */}
+                        {/*                 {strengthPR != null ? */}
+                        {/*                     <> */}
+                        {/*                         <p className="text-sm text-gray-300">Your PR</p> */}
+                        {/*                         <p className="text-sm text-gray-300">{strengthPR.set.weight} x {strengthPR.set.reps}</p> */}
+                        {/*                         <p className="text-sm text-gray-300">Estimated 1RM: {(strengthPR.ORM ?? 0).toFixed(0)} lbs</p> */}
+                        {/*                     </> */}
+                        {/*                     : */}
+                        {/*                     <p className="text-sm text-gray-300">No PR set yet.</p> */}
+                        {/*                 } */}
+                        {/*             </div> */}
+                        {/*             <p className="text-xs"></p> */}
+                        {/**/}
+                        {/*         </> */}
+                        {/*         : */}
+                        {/*         <div className="flex flex-1 items-center"> */}
+                        {/*             <p className="text-center text-gray-400">You haven't set your strength goal yet</p> */}
+                        {/*         </div> */}
+                        {/*     } */}
+                        {/* </div> */}
 
-                    {/*TODO: we have 3 options for goals, weight, cals, strength. If any of these is not set, replace the card
-                with a grayed out card saying to set goal and a button to redirect to there*/}
-                    {/* Add Goals Button */}
-                    {/* <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 mt-2 self-start"> */}
-                    {/*     Add Goals */}
-                    {/* </button> */}
+
+
+                        {/* Strength Goal */}
+                        <div className="dashboard-section-1 flex flex-col flex-1 p-4 bg-zinc-900/50 rounded-2xl shadow-sm border border-zinc-800">
+                            {(goalsRef.current.get("strength")?.target_weight != null &&
+                                goalsRef.current.get("strength")?.target_weight != 0)
+                                ? (
+                                    <>
+                                        <h3 className="text-lg font-semibold mb-3 text-blue-400 tracking-wide">
+                                            Strength Goal
+                                        </h3>
+
+                                        <div className="flex flex-col gap-2 text-gray-200">
+                                            {/* Exercise Info */}
+                                            <div className="flex justify-between items-center">
+                                                <p className="font-medium text-base">
+                                                    {userExercises?.find(ex => ex.id === goalsRef.current.get("strength")?.exercise_id)?.name}
+                                                </p>
+                                                <p className="text-sm text-gray-400 italic">
+                                                    Goal Set
+                                                </p>
+                                            </div>
+
+                                            {/* Target */}
+                                            <div className="flex justify-between text-sm">
+                                                <p className="text-gray-300">
+                                                    Target:
+                                                </p>
+                                                <p className="font-semibold text-gray-100">
+                                                    {goalsRef.current.get("strength")?.target_weight} lbs × {goalsRef.current.get("strength")?.target_reps} reps
+                                                </p>
+                                            </div>
+
+                                            {/* Goal 1RM */}
+                                            <div className="flex justify-between text-sm border-b border-zinc-800 pb-2 mb-2">
+                                                <p className="text-gray-400">Estimated 1RM</p>
+                                                <p className="font-semibold text-blue-400">
+                                                    {(goalsRef.current.get("strength")?.target_weight / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps)).toFixed(0)} lbs
+                                                </p>
+                                            </div>
+
+                                            {/* PR Section */}
+                                            <div className="flex flex-col gap-1">
+                                                <p className="text-sm text-gray-400">Your Best Set</p>
+
+                                                {strengthPR != null ? (
+                                                    <div className="flex justify-between items-center bg-zinc-800/50 px-3 py-2 rounded-lg border border-zinc-700">
+                                                        <div>
+                                                            <p className="text-sm text-gray-200">
+                                                                {strengthPR.set.weight} lbs × {strengthPR.set.reps} reps
+                                                            </p>
+                                                            <p className="text-xs text-gray-400">
+                                                                Est. 1RM: <span className="text-gray-100 font-medium">{(strengthPR.ORM ?? 0).toFixed(0)} lbs</span>
+                                                            </p>
+                                                        </div>
+
+                                                        {/* Small progress ring style indicator */}
+                                                        <div className="text-blue-400 font-bold text-sm">
+                                                            {Math.min(100, ((strengthPR.ORM ?? 0) /
+                                                                (goalsRef.current.get("strength")?.target_weight / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps)) * 100)
+                                                            ).toFixed(0)}%
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-gray-400 italic text-center py-2">
+                                                        No PR set yet
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                )
+                                : (
+                                    <div className="flex flex-1 items-center justify-center text-gray-500 italic">
+                                        You haven’t set your strength goal yet
+                                    </div>
+                                )
+                            }
+                        </div>
+
+                    </div>
 
                 </div>
 
