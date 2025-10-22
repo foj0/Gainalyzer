@@ -221,6 +221,13 @@ into a type that we can easily plot.
 ## 10-20:
 * Finished the goal section (at least the part when we have a valid goal set)
 * Starting the empty goal set for when goals still haven't been set.
+* Strength goal section complete too. May still go back and edit a bit.
+
+## 10-21:
+* Finished the calories. Didn't realize it wasn't actually using real data.
+* Need to fix the sizing/centering for the goals sections. It looks off on smaller screen sizes
+* Also trie to make all the gaol sections the same width. The calories is too wide.
+    * Probably just need to make the whole dashboard area wider again. I think it's too narrow
 
 
 
