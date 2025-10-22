@@ -6,9 +6,9 @@ import { LuPlus } from "react-icons/lu";
 export default function HelloSection({ fullName }: { fullName: string }) {
     return (
         <>
-            <div className="flex flex-col justify-center items-center gap-2">
+            <div className="flex flex-col justify-center items-center sm:flex-row sm:justify-between sm:items-start">
                 <div className="text-3xl text-center flex flex-col md:flex-row">
-                    Welcome&nbsp;<span className="font-bold">{fullName}</span> &nbsp;👋
+                    Welcome&nbsp;<span className="">{fullName}</span> &nbsp;
                 </div>
                 <Link
                     href="/log"

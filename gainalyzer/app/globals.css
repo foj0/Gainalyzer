@@ -500,7 +500,7 @@ input[disabled] {
 .navigation .selected {
     background-color: var(--sidebar-accent);
     color: var(--sidebar-accent-foreground);
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 .navigation-settings:hover {

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 export function useLogInputs() {
     const [weight, setWeight] = useState("");
     const [calories, setCalories] = useState("");
+    const [protein, setProtein] = useState("");
 
     // restore values from local storage on mount
     // useEffect(() => {
@@ -25,7 +26,9 @@ export function useLogInputs() {
         weight,
         setWeight,
         calories,
-        setCalories
+        setCalories,
+        protein,
+        setProtein,
     }
 }
 

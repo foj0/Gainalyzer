@@ -68,7 +68,7 @@ export default async function Page() {
             <div className="md:pl-[200px] xl:pl-[300px]">
 
                 {/* Main content area */}
-                <main className="max-w-screen 2xl:max-w-6/12 mx-auto mt-16 md:mt-0 space-y-6">
+                <main className="max-w-screen 2xl:max-w-8/12 mx-auto mt-16 md:mt-0 space-y-6">
                     {/* Mess around with the width maybe? Too wide looks odd. */}
                     {/* <main className="max-w-screen mx-auto mt-16 md:mt-0 space-y-6"> */}
                     <div className="flex items-center justify-center p-6">

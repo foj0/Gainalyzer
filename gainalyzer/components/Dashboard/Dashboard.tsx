@@ -27,6 +27,7 @@ type SupabaseLogResult = {
     log_date: string;
     bodyweight: number | null;
     calories: number | null;
+    protein: number | null;
     log_exercises: {
         weight: number | null;
         reps: number | null;
@@ -48,6 +49,7 @@ type Exercise = {
 type Log = {
     bodyweight: number | null;
     calories: number | null;
+    protein: number | null;
     log_date: string;
     exercises: Exercise[];
 };
@@ -119,6 +121,7 @@ export default function Dashboard() {
                             log_date,
                             bodyweight,
                             calories,
+                            protein,
                             log_exercises (
                                 weight,
                                 reps,
@@ -141,6 +144,7 @@ export default function Dashboard() {
                         log_date: log.log_date,
                         bodyweight: log.bodyweight,
                         calories: log.calories,
+                        protein: log.protein,
                         exercises: (log.log_exercises).map((exercise) => (
                             {
                                 weight: exercise.weight,
@@ -237,6 +241,7 @@ export default function Dashboard() {
             const averages = calculateAverageBWCals(logs);
             avgBodyweight = averages.avgBW;
             calories = averages.avgCal; // TODO: update to just todays calories
+            protein = mostRecentLog.protein;
         }
         setQuickStats(
             {
@@ -412,7 +417,7 @@ export default function Dashboard() {
                         <div className="dashboard-section-1 flex items-center gap-3 p-4 flex-1">
                             <Flame className="text-orange-500 w-6 h-6" />
                             <div>
-                                <h3 className="text-sm font-semibold">Today's Calories</h3>
+                                <h3 className="text-sm font-semibold">Avg Calories</h3>
                                 <p className="text-lg font-medium">
                                     {quickStats?.calories ?? "N/A"}
                                     <span> {quickStats?.calories != null ? "kcal" : ""} </span>
@@ -462,14 +467,14 @@ export default function Dashboard() {
                     <div className="dashboard-section flex flex-col gap-4 sm:flex-row sm:gap-6">
 
                         {/* Bodyweight Goal */}
-                        <div className="dashboard-section-1 flex flex-col flex-1 p-4 min-h-[200px]">
+                        <div className="dashboard-section-1 flex flex-col flex-1/3 p-4 min-h-[200px]">
                             {(goalsRef.current.get("bodyweight")?.target_value != null &&
                                 goalsRef.current.get("bodyweight")?.target_value != 0)
                                 ?
                                 <>
-                                    <h3 className="text-lg font-semibold mb-2">Bodyweight Goal</h3>
+                                    <h3 className="text-lg font-semibold mb-3">Bodyweight Goal</h3>
 
-                                    <div className="flex flex-col justify-center flex-1">
+                                    <div className="flex flex-col flex-1 ">
                                         <div className="flex justify-between">
                                             <p className="text-sm mb-2">Start: {bodyweightStart} lbs</p>
                                             <p className="text-sm mb-2">Goal: {bodyweightGoal} lbs</p>
@@ -487,7 +492,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Daily Calories Goal */}
-                        <div className="dashboard-section-1 flex flex-col flex-1 p-4 min-h-[200px]">
+                        <div className="dashboard-section-1 flex flex-col flex-1/3 p-4 min-h-[200px]">
                             {(goalsRef.current.get("calories")?.target_value != null &&
                                 goalsRef.current.get("calories")?.target_value != 0)
 
@@ -495,8 +500,8 @@ export default function Dashboard() {
 
                                 <>
                                     <h3 className="text-lg font-semibold mb-3">Daily Calorie Goal</h3>
-                                    <div className="flex justify-center items-center gap-8">
-                                        <div className="flex flex-1 w-30 items-center ml-5">
+                                    <div className="flex flex-1 justify-center items-center gap-8 sm:gap-8">
+                                        <div className="flex w-30 items-center mb-4">
                                             <CircularProgressbarWithChildren minValue={0} maxValue={goalsRef.current.get("calories")?.target_value ?? 0} value={quickStats?.calories ?? 0}
                                                 styles={buildStyles({
                                                     pathColor: '#3b82f6',   // filled (progress) part — Tailwind blue-500
@@ -506,25 +511,25 @@ export default function Dashboard() {
                                             >
                                                 <div style={{ fontSize: 12, marginTop: -5 }}>
                                                     <div className="flex flex-col text-center">
-                                                        <strong className="text-2xl">{quickStats?.calories ?? goalsRef.current.get("calories")?.target_value} </strong>
-                                                        <p className="text-md">remaining</p>
+                                                        <strong className="text-lg">{((goalsRef.current.get("calories")?.target_value - ((quickStats?.calories) ?? 0)))}</strong>
+                                                        <p className="">remaining</p>
                                                     </div>
                                                 </div>
                                             </CircularProgressbarWithChildren>
                                         </div>
-                                        <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col justify-around gap-3">
                                             <div className="flex gap-3">
                                                 <Flag className="w-6 h-6 text-orange-400" />
                                                 <div>
-                                                    <h3 className="text-sm font-semibold">Goal</h3>
-                                                    <p className="text-lg font-medium">{goalsRef.current.get("calories")?.target_value ?? 0}</p>
+                                                    <h3 className="text-base font-semibold">Goal</h3>
+                                                    <p className="text-base font-medium">{goalsRef.current.get("calories")?.target_value ?? 0}</p>
                                                 </div>
                                             </div>
                                             <div className="flex gap-3">
                                                 <Utensils className="w-6 h-6 text-blue-400" />
                                                 <div>
-                                                    <h3 className="text-sm font-semibold">Remaining</h3>
-                                                    <p className="text-lg font-medium">{Math.max((goalsRef.current.get("calories")?.target_value ?? 0) - (quickStats?.calories ?? 0), 0)}</p>
+                                                    <h3 className="text-base font-semibold">Food</h3>
+                                                    <p className="text-base font-medium">{(quickStats?.calories ?? 0)}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -540,7 +545,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Strength Goal */}
-                        <div className="dashboard-section-1 flex flex-col flex-1 p-4 bg-zinc-900/50 rounded-2xl shadow-sm border border-zinc-800 min-h-[200px]">
+                        <div className="dashboard-section-1 flex flex-col flex-1/3 p-4 bg-zinc-900/50 rounded-2xl shadow-sm border border-zinc-800 min-h-[200px]">
                             {(goalsRef.current.get("strength")?.target_weight != null &&
                                 goalsRef.current.get("strength")?.target_weight != 0)
                                 ? (
@@ -580,7 +585,7 @@ export default function Dashboard() {
 
                                             {/* PR Section */}
                                             <div className="flex flex-col gap-1">
-                                                <p className="text-sm text-gray-400">Your Best Set</p>
+                                                <p className="text-sm text-gray-400">{strengthPR != null ? "Your Best Set" : null}</p>
 
                                                 {strengthPR != null ? (
                                                     <div className="flex justify-between items-center bg-zinc-800/50 px-3 py-2 rounded-lg border border-zinc-700">

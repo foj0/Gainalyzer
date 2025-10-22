@@ -37,7 +37,7 @@ export default function LogPage() {
 
     // --- Date and user input ---
     const [date, setDate] = useState<Date | undefined>(new Date());
-    const { weight, setWeight, calories, setCalories } = useLogInputs();
+    const { weight, setWeight, calories, setCalories, protein, setProtein } = useLogInputs();
     const [weightMetric, setWeightMetric] = useState("lbs");
 
     // --- Exercises created in the user's library ---
@@ -66,6 +66,7 @@ export default function LogPage() {
             id,
             bodyweight,
             calories,
+            protein,
             log_exercises (
                 id,
                 exercise_id,
@@ -85,9 +86,10 @@ export default function LogPage() {
         }
 
         if (log) {
-            // Populate weight and calories
+            // Populate weight and calories and protein
             setWeight(log.bodyweight?.toString() ?? "");
             setCalories(log.calories?.toString() ?? "");
+            setProtein(log.protein?.toString() ?? "");
 
             // Map exercises from log_exercises
             setExercises(
@@ -107,6 +109,7 @@ export default function LogPage() {
             // Reset fields if no log
             setWeight("");
             setCalories("");
+            setProtein("");
             setExercises([]);
         }
     }
@@ -132,6 +135,7 @@ export default function LogPage() {
                         log_date: logDate,
                         bodyweight: weight || null,
                         calories: calories || null,
+                        protein: protein || null,
                     },
                     { onConflict: "user_id, log_date" } // conflict target
                 )
@@ -223,14 +227,16 @@ export default function LogPage() {
     function handleLogInput(event: React.ChangeEvent<HTMLInputElement>) {
         const val = event.target.value;
         const inputId = event.target.id;
+        // Allow digits, optional decimal, and at most ONE digit after decimal
+        const oneDecimalRegex = /^\d*(?:\.\d?)?$/;
+        // Only allow digits (no decimals)
+        const wholeNumbersRegex = /^\d*$/;
         if (inputId === "bodyweight") {
-            // Allow digits, optional decimal, and at most ONE digit after decimal
-            const weightRegex = /^\d*(?:\.\d?)?$/;
-            if (weightRegex.test(val)) setWeight(val);
+            if (oneDecimalRegex.test(val)) setWeight(val);
         } else if (inputId === "calories") {
-            // Only allow digits (no decimals)
-            const caloriesRegex = /^\d*$/;
-            if (caloriesRegex.test(val)) setCalories(val);
+            if (wholeNumbersRegex.test(val)) setCalories(val);
+        } else if (inputId === "protein") {
+            if (wholeNumbersRegex.test(val)) setProtein(val);
         }
     }
 
@@ -298,48 +304,39 @@ export default function LogPage() {
                     <div className="log-section p-2">
                         <div className="flex justify-center text-xl mb-4">Weigh-In & Calorie Log</div>
 
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 px-2 py-2">
+                        {/* Wrap entire section in a centered container */}
+                        <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 sm:gap-8 px-4 py-2 max-w-xl mx-auto">
 
-                            {/* weight */}
-                            <div className="flex justify-center items-center gap-2">
-                                <div>
-                                    Weight
-                                </div>
-                                <input
-                                    id="bodyweight"
-                                    className="log-input py-1 w-20 text-right"
-                                    placeholder="0"
-                                    value={weight}
-                                    onChange={handleLogInput}
-                                    onBlur={handleWeightBlur}
-                                    type="text"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    maxLength={6}
-                                />
-                                {/* use oninput filter to not allow letters */}
-                                <span>{weightMetric}</span>
-                                {/* onChange={} className={`grow`} placeholder='Email' value={inputs.email} name='email' required maxLength={254} /> */}
-                            </div>
+                            {[
+                                { id: "bodyweight", label: "Weight", value: weight, unit: weightMetric, onBlur: handleWeightBlur, maxLength: 6 },
+                                { id: "calories", label: "Calories", value: calories, unit: "cal", maxLength: 5 },
+                                { id: "protein", label: "Protein", value: protein, unit: "g", maxLength: 5 },
+                            ].map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="flex justify-center items-center gap-2 w-full sm:w-auto"
+                                >
+                                    {/* Label (fixed width, right-aligned for even spacing) */}
+                                    <div className="w-20 text-right">{item.label}</div>
 
-                            {/* cals */}
-                            <div className="flex justify-center items-center gap-2">
-                                <div>
-                                    Calories
+                                    {/* Input (uniform width) */}
+                                    <input
+                                        id={item.id}
+                                        className="log-input py-1 w-24 text-right"
+                                        placeholder="0"
+                                        value={item.value}
+                                        onChange={handleLogInput}
+                                        onBlur={item.onBlur}
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        maxLength={item.maxLength}
+                                    />
+
+                                    {/* Units (aligned left, same width for all) */}
+                                    <div className="w-10 text-left">{item.unit}</div>
                                 </div>
-                                <input
-                                    id="calories"
-                                    className="log-input py-1 w-20 text-right"
-                                    placeholder="0"
-                                    value={calories}
-                                    onChange={handleLogInput}
-                                    type="text"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    maxLength={5}
-                                />
-                                <span>kcal</span>
-                            </div>
+                            ))}
                         </div>
                     </div>
 

@@ -22,6 +22,7 @@ export default function Sidebar() {
         { href: "/dashboard", label: "Dashboard" }, // change to "/dashboard" later
         { href: "/log", label: "Log" },
         { href: "/goals", label: "Goals" },
+        { href: "/exercises", label: "Exercises" },
         { href: "/profile", label: "Profile" },
         { href: "/about", label: "About" },
     ]

@@ -229,18 +229,19 @@ into a type that we can easily plot.
 * Also trie to make all the gaol sections the same width. The calories is too wide.
     * Probably just need to make the whole dashboard area wider again. I think it's too narrow
 
+## 10-22:
+* Adjusted the responsiveness of the dashboard layout a bit more
+* Added protein to log and made dashboard fetch it with logs
+
 
 
 ### todo:
-* TODO: we have 3 options for goals, weight, cals, strength. If any of these is not set, replace the card
-    with a grayed out card saying to set goal and a button to redirect to there
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.
     would help fill up the screen a little more. So don't put the pfp thing at the bottom of the side panel like i was thinking.
 * Make an exercises page where you can select an exercise and it displays a table of all your logs for that specific exercise
 and a graph for it.
 * Have a fixed aspect ratio for the exercise bw chart so it doesn't get elongated height wise. Should always be wider.
 * idk. Move the isMObile check from the exercisebodyweight chart to the dashboard page and do pass it down as props to everything else.
-* Make the navbar be a side panel like gpt app to match desktop on mobile
 * Redo the exercise and date range selects to be better looking and limit how many options show at once on exercise select.
 * Fix the x axis ticks. They're not changing for some reason.
 * Fix the "All" on the first bodyweight chart
@@ -249,12 +250,8 @@ and a graph for it.
 * Make it so that you can't save a log without filling in the weight/reps in an exercise card
 * Create an exercise selector dropdown that pulls from the users exercises, default to the most recently added
 , and show blank or just "exercise" if there's none.
-* Need to Split the quick stats into (weight /cal) bubbles and have images in each (scale/food icons)
 * Move all log colors down one. Darker looks better. Or invert to where we have lighter background than the section cards
 * On the quick stats have a hover popup that says that the avg is taken over the last 7 days for weight/cal
-* Start on Dashboard. Get a graph up for the bodyweight or something
-    - app/dashboard/page should be server component, insert a separate client dashboard component within it.
-    - Should I do similar thing to make loading pages faster? idk
 * Might need to edit the FetchLogForDate function to use log_id and not log_date
 * In the calendar picker highlight days with filled in logs?
 * Setup some cache for date logs so we don't have to keep fetching from db every time
