@@ -232,14 +232,24 @@ into a type that we can easily plot.
 ## 10-22:
 * Adjusted the responsiveness of the dashboard layout a bit more
 * Added protein to log and made dashboard fetch it with logs
+* Started the exercises page
 
 
 
 ### todo:
+* Fix goal section colors in light mode
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.
     would help fill up the screen a little more. So don't put the pfp thing at the bottom of the side panel like i was thinking.
 * Make an exercises page where you can select an exercise and it displays a table of all your logs for that specific exercise
 and a graph for it.
+    - each exercise is just an item in a list.
+    We have a kind of table and each exercise is a row with borders on every side.
+    Have a search bar on top to filter exercises by name
+    On the far right of the row, have a dropdown arrow and a delete button and an edit name button with pencil icon
+        - delete just deletes
+        - edit can change the exercise name
+        - drop down arrow displays another table with all your logs for that exercise
+        - Idk if i should store this data again or if theres some way to reference the logs table
 * Have a fixed aspect ratio for the exercise bw chart so it doesn't get elongated height wise. Should always be wider.
 * idk. Move the isMObile check from the exercisebodyweight chart to the dashboard page and do pass it down as props to everything else.
 * Redo the exercise and date range selects to be better looking and limit how many options show at once on exercise select.
