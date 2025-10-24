@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { BiEditAlt } from "react-icons/bi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { BsChevronDown } from "react-icons/bs";
 import { TbLoader2 } from "react-icons/tb";
 import { SupabaseClient, User } from "@supabase/supabase-js";
-import { Tooltip } from 'react-tooltip';
+import { Tooltip } from "react-tooltip";
+import EditExerciseDialog from "./EditExerciseDialog";
+import DeleteExerciseAlert from "./DeleteExerciseAlert";
 
 type Exercise = {
     id: string;
@@ -18,9 +19,11 @@ type ExerciseRowProps = {
     exercise: Exercise;
     onEdit(): void;
     onDelete(): void;
+    setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+
 }
 
-export default function ExerciseRow({ supabase, user, exercise, onDelete, onEdit }: ExerciseRowProps) {
+export default function ExerciseRow({ supabase, user, exercise, onDelete, onEdit, setExercises }: ExerciseRowProps) {
     const [logs, setLogs] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -46,15 +49,6 @@ export default function ExerciseRow({ supabase, user, exercise, onDelete, onEdit
         }
     }
 
-    async function openEditModal() {
-
-    }
-
-    async function openDeleteModal() {
-        return;
-    }
-
-
     return (
         <div className="exercise-row p-4">
             <div className="flex flex-col">
@@ -71,20 +65,8 @@ export default function ExerciseRow({ supabase, user, exercise, onDelete, onEdit
                             anchorSelect="#ChevronDown"
                             content="View logs"
                         />
-                        <a id="Edit">
-                            <BiEditAlt className="text-gray-500 hover:cursor-pointer" />
-                        </a>
-                        <Tooltip
-                            anchorSelect="#Edit"
-                            content="Edit exercise"
-                        />
-                        <a id="Delete">
-                            <RiDeleteBinLine className="text-gray-500 hover:cursor-pointer" />
-                        </a>
-                        <Tooltip
-                            anchorSelect="#Delete"
-                            content="Delete exercise"
-                        />
+                        <EditExerciseDialog user={user} supabase={supabase} exercise={exercise} />
+                        <DeleteExerciseAlert user={user} supabase={supabase} exercise={exercise} setExercises={setExercises} />
                     </div>
                 </div>
                 {open && (

@@ -235,10 +235,14 @@ into a type that we can easily plot.
 * Started the exercises page
 
 ## 10-24:
-*
+* Exercises page displays users exercises
+* Got exercise table to show dropdown list of logs
+* Exercise name edit and exercise deletion working.
+* Look into making edit not completely refresh exercises table
 
 
 ### todo:
+* After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?
 * Fix goal section colors in light mode
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.
     would help fill up the screen a little more. So don't put the pfp thing at the bottom of the side panel like i was thinking.

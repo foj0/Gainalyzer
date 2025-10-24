@@ -7,7 +7,6 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import ExerciseRow from "./ExerciseRow";
 import { Search } from "lucide-react";
-import { Tooltip } from 'react-tooltip';
 
 type Exercise = {
     id: string;
@@ -51,6 +50,7 @@ export default function ExerciseTable() {
             .from("exercises")
             .select("id, user_id, name")
             .eq("user_id", user.id)
+            .order("name", { ascending: true });
 
         if (error) {
             console.error("Error fetching exercises: ", error);
@@ -73,10 +73,10 @@ export default function ExerciseTable() {
         if (exerciseSearch == "") {
             setFilteredExercises(exercises);
         } else {
-            const searchFilteredExercises = exercises.filter((exercise) => (exercise.name.toLowerCase().includes(exerciseSearch)));
+            const searchFilteredExercises = exercises.filter((exercise) => (exercise.name.toLowerCase().includes(exerciseSearch.toLowerCase())));
             setFilteredExercises(searchFilteredExercises);
         }
-    }, [exerciseSearch]);
+    }, [exercises, exerciseSearch]);
 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newInput: string = e.target.value;
@@ -121,19 +121,24 @@ export default function ExerciseTable() {
             </div>
 
             {/* List of user exercises */}
-            <div className="dashboard-section-1 border border-[#333333]">
-                {filteredExercises.map(e => (
-                    <ExerciseRow
-                        key={e.id}
-                        supabase={supabase}
-                        user={user}
-                        exercise={e}
-                        onEdit={() => openEditModal(e)}
-                        onDelete={() => deleteExercise(e)}
-                    />
+            {filteredExercises.length > 0 ?
+                <div className="dashboard-section-1 border border-[#333333]">
+                    {filteredExercises.map(e => (
+                        <ExerciseRow
+                            key={e.id}
+                            supabase={supabase}
+                            user={user}
+                            exercise={e}
+                            onEdit={() => openEditModal(e)}
+                            onDelete={() => deleteExercise(e)}
+                            setExercises={setExercises}
+                        />
 
-                ))}
-            </div>
+                    ))}
+                </div>
+                :
+                <div className="flex justify-center text-gray-500">No exercises.</div>
+            }
 
         </div>
     );
