@@ -562,13 +562,13 @@ input[disabled] {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     /* soft shadow for depth */
     /* internal breathing room */
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    /* transition: transform 0.15s ease, box-shadow 0.15s ease; */
 }
 
-.dashboard-section-1:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-}
+/* .dashboard-section-1:hover { */
+/*     transform: translateY(-2px); */
+/*     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); */
+/* } */
 
 .dashboard-section-2 {
     background-color: var(--dashboard-section-secondary);
@@ -601,6 +601,14 @@ option {
 
 option:hover {
     background-color: green;
+}
+
+.exercise-row {
+    border-bottom: 1px solid var(--border);
+}
+
+.search-input {
+    border: 1px solid var(--border);
 }
 
 

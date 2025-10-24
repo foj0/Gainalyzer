@@ -234,6 +234,8 @@ into a type that we can easily plot.
 * Added protein to log and made dashboard fetch it with logs
 * Started the exercises page
 
+## 10-24:
+*
 
 
 ### todo:

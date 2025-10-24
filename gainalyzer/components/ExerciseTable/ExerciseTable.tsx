@@ -6,6 +6,8 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import ExerciseRow from "./ExerciseRow";
+import { Search } from "lucide-react";
+import { Tooltip } from 'react-tooltip';
 
 type Exercise = {
     id: string;
@@ -29,22 +31,17 @@ export default function ExerciseTable() {
     const [user, setUser] = useState<User | null>(null);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [logs, setLogs] = useState<Log[]>([]);
+    const [exerciseSearch, setExerciseSearch] = useState<string>("")
+    const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
 
-    useEffect(() => {
-        async function fetchUser() {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (error) {
-                console.error("Error fetching user: ", error);
-                return;
-            }
-            if (!user) return;
-            setUser(user);
+    async function fetchUser() {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+            console.error("Error fetching user: ", error);
+            return;
         }
-        fetchUser();
-    }, []);
-
-    function handleCreateExercise() {
-        return;
+        if (!user) return;
+        setUser(user);
     }
 
     async function fetchExercises() {
@@ -64,6 +61,32 @@ export default function ExerciseTable() {
         setExercises(exercises);
     }
 
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        fetchExercises();
+    }, [user]);
+
+    useEffect(() => {
+        if (exerciseSearch == "") {
+            setFilteredExercises(exercises);
+        } else {
+            const searchFilteredExercises = exercises.filter((exercise) => (exercise.name.toLowerCase().includes(exerciseSearch)));
+            setFilteredExercises(searchFilteredExercises);
+        }
+    }, [exerciseSearch]);
+
+    function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const newInput: string = e.target.value;
+        setExerciseSearch(newInput);
+    }
+
+    function handleCreateExercise() {
+        return;
+    }
+
     function openEditModal(exercise: Exercise) {
         return;
     }
@@ -73,28 +96,43 @@ export default function ExerciseTable() {
     }
 
     return (
-        <div>
-            <h1 className="flex justify-center text-xl font-semibold m-10">Your Exercises</h1>
+        <div className="p-2">
+            <div className="flex flex-col">
+                <h1 className="text-xl font-bold mt-5">Exercises</h1>
+                <p className="text-sm text-gray-500">View, create, edit, and delete your exercises.</p>
+            </div>
 
-            <div className="flex justify-between items-center ">
-                <p>Exercises</p>
+            <div className="flex justify-between items-center mt-5 mb-5 exercise-row">
+                <div className="relative w-50 max-w-sm mb-2">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                        type="text"
+                        placeholder="Search Exercises"
+                        className="search-input w-full pl-10 pr-4 py-2 rounded-lg placeholder-gray-500 focus:outline-none"
+                        onChange={handleInputChange}
+                        value={exerciseSearch}
+                        name="exerciseSearch"
+                    />
+                </div>
                 <button className="button mb-3" onClick={handleCreateExercise}>Create Exercise</button>
             </div>
 
+            <div className="flex justify-end">
+            </div>
+
             {/* List of user exercises */}
-            <div className="border border-gray-700">
-                {exercises.map(e => (
+            <div className="dashboard-section-1 border border-[#333333]">
+                {filteredExercises.map(e => (
                     <ExerciseRow
                         key={e.id}
+                        supabase={supabase}
+                        user={user}
                         exercise={e}
                         onEdit={() => openEditModal(e)}
                         onDelete={() => deleteExercise(e)}
                     />
 
                 ))}
-
-
-
             </div>
 
         </div>
