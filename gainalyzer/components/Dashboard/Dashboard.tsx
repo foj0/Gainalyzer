@@ -57,7 +57,8 @@ type Log = {
 type QuickStats = {
     currentBodyweight: number | null;
     avgBodyweight: number | null;
-    calories: number | null;
+    avgCalories: number | null;
+    todaysCalories: number | null;
     protein: number | null;
     date: string | null;
 }
@@ -222,7 +223,8 @@ export default function Dashboard() {
         let mostRecentLog: Log | undefined;
         let currentBodyweight = null;
         let avgBodyweight = null;
-        let calories = null;
+        let avgCalories = null;
+        let todaysCalories = null
         let protein = null;
         let date = null;
         let formattedDate = null;
@@ -240,14 +242,26 @@ export default function Dashboard() {
 
             const averages = calculateAverageBWCals(logs);
             avgBodyweight = averages.avgBW;
-            calories = averages.avgCal; // TODO: update to just todays calories
-            protein = mostRecentLog.protein;
+            avgCalories = averages.avgCal;
+
+            // protein and todaysCalories are daily metrics.
+            // So if the most recent log isn't for today, set those to 0.
+            const today = new Date();
+            if (today === date) {
+                protein = mostRecentLog.protein;
+                todaysCalories = mostRecentLog.calories;
+            } else {
+                protein = 0;
+                todaysCalories = 0;
+            }
+
         }
         setQuickStats(
             {
                 currentBodyweight: currentBodyweight ?? null,
                 avgBodyweight: avgBodyweight ?? null,
-                calories: calories ?? null,
+                avgCalories: avgCalories ?? null,
+                todaysCalories: todaysCalories ?? null,
                 protein: protein ?? null,
                 date: formattedDate ?? null,
             }
@@ -419,11 +433,11 @@ export default function Dashboard() {
                             <div>
                                 <h3 className="text-sm font-semibold">Avg Calories</h3>
                                 <p className="text-lg font-medium">
-                                    {quickStats?.calories ?? "N/A"}
-                                    <span> {quickStats?.calories != null ? "kcal" : ""} </span>
+                                    {quickStats?.avgCalories ?? "N/A"}
+                                    <span> {quickStats?.avgCalories != null ? "kcal" : ""} </span>
                                 </p>
                                 {
-                                    quickStats?.calories != null ?
+                                    quickStats?.avgCalories != null ?
                                         <p className="text-sm font-light text-gray-500">last 7 days</p>
                                         :
                                         <p className="text-sm font-light text-gray-500">missing log info</p>
@@ -511,7 +525,7 @@ export default function Dashboard() {
                                             >
                                                 <div style={{ fontSize: 12, marginTop: -5 }}>
                                                     <div className="flex flex-col text-center">
-                                                        <strong className="text-lg">{((goalsRef.current.get("calories")?.target_value - ((quickStats?.calories) ?? 0)))}</strong>
+                                                        <strong className="text-lg">{((goalsRef.current.get("calories")?.target_value - ((quickStats?.todaysCalories) ?? 0)))}</strong>
                                                         <p className="">remaining</p>
                                                     </div>
                                                 </div>
@@ -529,7 +543,7 @@ export default function Dashboard() {
                                                 <Utensils className="w-6 h-6 text-blue-400" />
                                                 <div>
                                                     <h3 className="text-base font-semibold">Food</h3>
-                                                    <p className="text-base font-medium">{(quickStats?.calories ?? 0)}</p>
+                                                    <p className="text-base font-medium">{(quickStats?.todaysCalories ?? 0)}</p>
                                                 </div>
                                             </div>
                                         </div>

@@ -17,13 +17,10 @@ type ExerciseRowProps = {
     supabase: SupabaseClient;
     user: User;
     exercise: Exercise;
-    onEdit(): void;
-    onDelete(): void;
     setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
-
 }
 
-export default function ExerciseRow({ supabase, user, exercise, onDelete, onEdit, setExercises }: ExerciseRowProps) {
+export default function ExerciseRow({ supabase, user, exercise, setExercises }: ExerciseRowProps) {
     const [logs, setLogs] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);

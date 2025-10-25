@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState, useRef } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
@@ -7,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import ExerciseRow from "./ExerciseRow";
 import { Search } from "lucide-react";
+import { TbLoader2 } from "react-icons/tb";
 
 type Exercise = {
     id: string;
@@ -32,6 +32,7 @@ export default function ExerciseTable() {
     const [logs, setLogs] = useState<Log[]>([]);
     const [exerciseSearch, setExerciseSearch] = useState<string>("")
     const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
+    const [loading, setLoading] = useState(false);
 
     async function fetchUser() {
         const { data: { user }, error } = await supabase.auth.getUser();
@@ -46,6 +47,7 @@ export default function ExerciseTable() {
     async function fetchExercises() {
         if (!user) return;
 
+        setLoading(true);
         const { data: exercises, error } = await supabase
             .from("exercises")
             .select("id, user_id, name")
@@ -56,9 +58,12 @@ export default function ExerciseTable() {
             console.error("Error fetching exercises: ", error);
             return;
         }
-        if (!exercises) return;
-
+        if (!exercises) {
+            setLoading(false);
+            return;
+        }
         setExercises(exercises);
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -87,13 +92,6 @@ export default function ExerciseTable() {
         return;
     }
 
-    function openEditModal(exercise: Exercise) {
-        return;
-    }
-
-    function deleteExercise(exercise: Exercise) {
-        return
-    }
 
     return (
         <div className="p-2">
@@ -121,23 +119,26 @@ export default function ExerciseTable() {
             </div>
 
             {/* List of user exercises */}
-            {filteredExercises.length > 0 ?
-                <div className="dashboard-section-1 border border-[#333333]">
-                    {filteredExercises.map(e => (
-                        <ExerciseRow
-                            key={e.id}
-                            supabase={supabase}
-                            user={user}
-                            exercise={e}
-                            onEdit={() => openEditModal(e)}
-                            onDelete={() => deleteExercise(e)}
-                            setExercises={setExercises}
-                        />
-
-                    ))}
+            {loading ? (
+                <div className="flex justify-center py-4">
+                    <TbLoader2 className="animate-spin" />
                 </div>
-                :
-                <div className="flex justify-center text-gray-500">No exercises.</div>
+            ) :
+                filteredExercises.length > 0 ?
+                    <div className="dashboard-section-1 border border-[#333333]">
+                        {filteredExercises.map(e => (
+                            <ExerciseRow
+                                key={e.id}
+                                supabase={supabase}
+                                user={user}
+                                exercise={e}
+                                setExercises={setExercises}
+                            />
+
+                        ))}
+                    </div>
+                    :
+                    <div className="flex justify-center text-gray-500">No exercises.</div>
             }
 
         </div>
