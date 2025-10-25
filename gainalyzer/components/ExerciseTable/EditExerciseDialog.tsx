@@ -19,7 +19,7 @@ type Exercise = {
 }
 
 type props = {
-    user: User;
+    user: User | null;
     supabase: SupabaseClient;
     exercise: Exercise;
 }
@@ -28,6 +28,8 @@ export default function EditExerciseDialog({ user, supabase, exercise }: props) 
     const [name, setName] = useState<string>(exercise.name);
 
     async function handleSubmit() {
+        if (!user) return;
+
         if (exercise.name.toLowerCase() === name.toLowerCase()) {
             toast.warning("Exercise name already in use.");
             return

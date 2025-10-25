@@ -15,7 +15,7 @@ type Exercise = {
 
 type ExerciseRowProps = {
     supabase: SupabaseClient;
-    user: User;
+    user: User | null;
     exercise: Exercise;
     setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
 }
@@ -26,6 +26,7 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
     const [loading, setLoading] = useState(false);
 
     async function toggleDropdown() {
+        if (!user) return;
         setOpen(!open);
         if (!open && logs.length === 0) {
             setLoading(true);

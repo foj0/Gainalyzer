@@ -22,9 +22,8 @@ type Exercise = {
     name: string;
 }
 
-
 type props = {
-    user: User;
+    user: User | null;
     supabase: SupabaseClient;
     exercise: Exercise;
     setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
@@ -34,6 +33,7 @@ export default function DeleteExerciseAlert({ user, supabase, exercise, setExerc
     const [name, setName] = useState<string>(exercise.name);
 
     async function handleDelete() {
+        if (!user) return;
         const { error } = await supabase
             .from("exercises")
             .delete()

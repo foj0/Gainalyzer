@@ -240,6 +240,12 @@ into a type that we can easily plot.
 * Exercise name edit and exercise deletion working.
 * Look into making edit not completely refresh exercises table
 
+## 10-24:
+* Added loading icon to exercises while the table loads, so it doesn't flash
+"No exercises" but instead just shows a loading circle.
+* Creating exercises now works.
+* Sort on creating so new exercise is added in order
+
 
 ### todo:
 * After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?

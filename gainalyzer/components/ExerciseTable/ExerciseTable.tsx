@@ -7,6 +7,7 @@ import { User } from "@supabase/supabase-js";
 import ExerciseRow from "./ExerciseRow";
 import { Search } from "lucide-react";
 import { TbLoader2 } from "react-icons/tb";
+import CreateExercise from "./CreateExercise";
 
 type Exercise = {
     id: string;
@@ -88,11 +89,6 @@ export default function ExerciseTable() {
         setExerciseSearch(newInput);
     }
 
-    function handleCreateExercise() {
-        return;
-    }
-
-
     return (
         <div className="p-2">
             <div className="flex flex-col">
@@ -112,7 +108,9 @@ export default function ExerciseTable() {
                         name="exerciseSearch"
                     />
                 </div>
-                <button className="button mb-3" onClick={handleCreateExercise}>Create Exercise</button>
+                {/* <button className="button mb-3" onClick={handleCreateExercise}>Create Exercise</button> */}
+                <CreateExercise exercises={exercises} setExercises={setExercises} supabase={supabase} user={user} />
+
             </div>
 
             <div className="flex justify-end">
@@ -145,4 +143,3 @@ export default function ExerciseTable() {
     );
 
 }
-
