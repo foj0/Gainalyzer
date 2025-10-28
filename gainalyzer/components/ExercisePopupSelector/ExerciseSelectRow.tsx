@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { useEffect, useState } from "react";
 import { BsChevronDown } from "react-icons/bs";
 import { TbLoader2 } from "react-icons/tb";
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { Tooltip } from "react-tooltip";
+import { CheckIcon } from '@heroicons/react/16/solid'
+import { Checkbox } from "@/components/ui/checkbox"
 
 type Exercise = {
     id: string;
@@ -15,13 +16,18 @@ type ExerciseRowProps = {
     supabase: SupabaseClient;
     user: User | null;
     exercise: Exercise;
-    setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+    templateExercises: Exercise[];
+    selectedExercises: Exercise[];
+    setSelectedExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
 }
 
-export default function ExerciseRow({ supabase, user, exercise, setExercises }: ExerciseRowProps) {
+export default function ExerciseSelectRow({ supabase, user, exercise, templateExercises, selectedExercises, setSelectedExercises }: ExerciseRowProps) {
     const [logs, setLogs] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    // const [enabled, setEnabled] = useState(false);
+    const enabled = selectedExercises.some(ex => ex.id === exercise.id);
+
 
     async function toggleDropdown() {
         if (!user) return;
@@ -45,6 +51,29 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
         }
     }
 
+    function handleCheckboxToggle(checked: boolean) {
+        // setEnabled(checked);
+
+        setSelectedExercises(prev => {
+            if (checked) {
+                // Add this exercise if it’s not already in the list
+                if (!prev.some(ex => ex.id === exercise.id)) {
+                    return [...prev, exercise];
+                }
+                return prev; // no duplicates
+            } else {
+                // Remove this exercise
+                return prev.filter(ex => ex.id !== exercise.id);
+            }
+        });
+    }
+
+    // useEffect(() => {
+    //     if (selectedExercises.some((e) => e.id === exercise.id)) {
+    //         setEnabled(true);
+    //     }
+    // }, []);
+
     return (
         <div className="exercise-row p-4">
             <div className="flex flex-col">
@@ -61,7 +90,15 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
                             anchorSelect="#ChevronDown"
                             content="View logs"
                         />
-                        {/*Add checkbox here and when checked add to a checkedExercises list*/}
+                        <Checkbox
+                            checked={enabled}
+                            onCheckedChange={handleCheckboxToggle}
+                            className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-white/15 
+                            ring-inset focus:not-data-focus:outline-none data-checked:bg-white 
+                            data-focus:outline data-focus:outline-offset-2 data-focus:outline-white"
+                        >
+                            <CheckIcon className="hidden size-4 fill-black group-data-checked:block" />
+                        </Checkbox>
                     </div>
                 </div>
                 {open && (
