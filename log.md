@@ -240,11 +240,19 @@ into a type that we can easily plot.
 * Exercise name edit and exercise deletion working.
 * Look into making edit not completely refresh exercises table
 
-## 10-24:
+## 10-25:
 * Added loading icon to exercises while the table loads, so it doesn't flash
 "No exercises" but instead just shows a loading circle.
 * Creating exercises now works.
 * Sort on creating so new exercise is added in order
+
+## 10-27:
+* Starting templates page
+* Going to make a new exercise selector. Popup dialog that lists out exercises in row
+and you click click on them to mark and then when you hit add all marked exercises are added.
+Replacing the dropdown menu cause that's ugly.
+
+
 
 
 ### todo:

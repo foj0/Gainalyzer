@@ -4,8 +4,6 @@ import { BsChevronDown } from "react-icons/bs";
 import { TbLoader2 } from "react-icons/tb";
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { Tooltip } from "react-tooltip";
-import EditExerciseDialog from "./EditExerciseDialog";
-import DeleteExerciseAlert from "./DeleteExerciseAlert";
 
 type Exercise = {
     id: string;
@@ -63,8 +61,7 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
                             anchorSelect="#ChevronDown"
                             content="View logs"
                         />
-                        <EditExerciseDialog user={user} supabase={supabase} exercise={exercise} />
-                        <DeleteExerciseAlert user={user} supabase={supabase} exercise={exercise} setExercises={setExercises} />
+                        {/*Add checkbox here and when checked add to a checkedExercises list*/}
                     </div>
                 </div>
                 {open && (
@@ -103,3 +100,4 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
         </div>
     );
 }
+

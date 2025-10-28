@@ -611,6 +611,16 @@ option:hover {
     border: 1px solid var(--border);
 }
 
+.exercise-dropdown-table {
+    border: 1px solid var(--border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+}
+
+thead th {
+    border-bottom: 1px solid var(--border);
+}
 
 /* Light & Dark mode defaults */
 :root {

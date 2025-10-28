@@ -23,6 +23,7 @@ export default function Sidebar() {
         { href: "/log", label: "Log" },
         { href: "/goals", label: "Goals" },
         { href: "/exercises", label: "Exercises" },
+        { href: "/templates", label: "Templates" },
         { href: "/profile", label: "Profile" },
         { href: "/about", label: "About" },
     ]

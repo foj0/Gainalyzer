@@ -238,14 +238,22 @@ export default function GoalsPage() {
     function handleBlur() {
         // Blur is when you click off an input field
         // remove trailing dots
-        if (bodyweightStart.endsWith(".")) {
-            setBodyweightGoal(bodyweightStart.slice(0, -1));
+        const startStr = String(bodyweightStart);
+        const goalStr = String(bodyweightGoal); // bodyweight goal
+        const calStr = String(calorieGoal);
+        const weightGoalStr = String(weightGoal); // strength goal
+
+        if (startStr.endsWith(".")) {
+            setBodyweightStart(startStr.slice(0, -1));
         }
-        if (bodyweightGoal.endsWith(".")) {
-            setBodyweightGoal(bodyweightGoal.slice(0, -1));
+        if (goalStr.endsWith(".")) {
+            setBodyweightGoal(goalStr.slice(0, -1));
         }
-        if (calorieGoal.endsWith(".")) {
-            setCalorieGoal(calorieGoal.slice(0, -1));
+        if (calStr.endsWith(".")) {
+            setCalorieGoal(calStr.slice(0, -1));
+        }
+        if (weightGoalStr.endsWith(".")) {
+            setWeightGoal(weightGoalStr.slice(0, -1));
         }
     }
 
