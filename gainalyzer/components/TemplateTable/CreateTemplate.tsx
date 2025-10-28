@@ -48,7 +48,7 @@ type props = {
 
 
 export default function CreateTemplate({ exercises, setTemplates, supabase, user }: props) {
-    // const [open, setOpen] = useState(false); // if the dialog is open
+    const [open, setOpen] = useState(false); // if the dialog is open
     const [step, setStep] = useState<view>("createTemplate"); // to conditionally render either the createTemplate form or the selectExercises form
     const [templateName, setTemplateName] = useState("");
     const [templateExercises, setTemplateExercises] = useState<Exercise[]>([]); // exercises added to this template
@@ -62,13 +62,13 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
 
 
     function handleOpen() {
-        // setOpen(true);
+        setOpen(true);
         setStep("createTemplate");
         setErrorMessage("");
     }
 
     function handleClose() {
-        // setOpen(false);
+        setOpen(false);
         setStep("createTemplate");
     }
 
@@ -83,6 +83,12 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
         setTemplateExercises(prev => prev.filter(ex => ex.id != id));
     }
 
+    // Reset template to blank when we open/close the create template modal
+    useEffect(() => {
+        setTemplateExercises([]);
+        setTemplateName("");
+    }, [open])
+
     // SelectExercises popup functions 
     useEffect(() => {
         if (exerciseSearch == "") {
@@ -93,10 +99,9 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
         }
     }, [exercises, exerciseSearch]);
 
-    // When we press "add" to submit. Not just clicking the checkbox.
+    // When we press "Save" button to submit. Not just clicking the checkbox.
     function handleSaveExercises() {
         setTemplateExercises(selectedExercises);
-        // setOpen(false);
         setStep("createTemplate");
     }
 
@@ -121,13 +126,12 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
 
     return (
         <div>
-            <Dialog >
+            <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-
                     <button className="button mb-3" onClick={handleOpen}>Create Template</button>
                 </DialogTrigger>
-                {step === "createTemplate" &&
 
+                {step === "createTemplate" &&
                     <DialogContent className="sm:max-w-md flex flex-col justify-between">
                         <DialogHeader>
                             <DialogTitle className="text-center">Create New Workout Template</DialogTitle>
@@ -189,10 +193,10 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                             >
                                 Add Exercises
                             </button>
-
                         </form>
                     </DialogContent>
                 }
+
                 {step === "selectExercises" &&
                     <DialogContent className="sm:max-w-md flex flex-col justify-between max-h-[95vh] overflow-y-auto">
                         <DialogHeader>
@@ -212,7 +216,6 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                                 name="exerciseSearch"
                             />
                         </div>
-
 
                         {loading ? (
                             <div className="flex justify-center py-4">
@@ -249,7 +252,6 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                             >
                                 Save
                             </button>
-
                         </div>
                     </DialogContent>
                 }
