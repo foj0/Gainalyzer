@@ -252,7 +252,19 @@ into a type that we can easily plot.
 and you click click on them to mark and then when you hit add all marked exercises are added.
 Replacing the dropdown menu cause that's ugly.
 
+## 10-28:
+* Fixed nested dialog issue of closing one closes all. I guess for some reason having a 
+form submit causes them all to close as opposed to just a button that calls the same function.
+Also specify the button to be in <DialogClose></DialogClose> to actually close the dialog
+not just setOpen(false).
+I already had the nested dialogs working so I'll leave it. But a better design is to
+just use one dialog and load different content based on what we select.
+* NVM nested dialogs made state management cancer. Did conditional rendering on one dialog
+and works easily now.
+* Template resets on open/close now
 
+## 10-29:
+* template grid
 
 
 ### todo:

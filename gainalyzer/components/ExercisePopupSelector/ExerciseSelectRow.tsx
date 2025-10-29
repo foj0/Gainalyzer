@@ -68,12 +68,6 @@ export default function ExerciseSelectRow({ supabase, user, exercise, templateEx
         });
     }
 
-    // useEffect(() => {
-    //     if (selectedExercises.some((e) => e.id === exercise.id)) {
-    //         setEnabled(true);
-    //     }
-    // }, []);
-
     return (
         <div className="exercise-row p-4">
             <div className="flex flex-col">
@@ -137,4 +131,3 @@ export default function ExerciseSelectRow({ supabase, user, exercise, templateEx
         </div>
     );
 }
-

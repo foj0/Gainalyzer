@@ -15,8 +15,7 @@ import { SupabaseClient, User } from "@supabase/supabase-js"
 import { RiDeleteBinLine } from "react-icons/ri";
 import { Search } from "lucide-react";
 import { TbLoader2 } from "react-icons/tb";
-import ExerciseSelectRow from "../ExercisePopupSelector/ExerciseSelectRow"
-
+import ExerciseSelectRow from "../ExercisePopupSelector/ExerciseSelectRow";
 
 type view = "createTemplate" | "selectExercises";
 
@@ -30,24 +29,24 @@ type TemplateExercise = {
     id: string;
     template_id: string;
     exercise_id: string;
+    name: string;
 }
 
 type Template = {
     id: string;
-    user_id: string;
     name: string;
-    exercises: TemplateExercise[];
+    template_exercises: TemplateExercise[];
 }
 
 type props = {
-    exercises: Exercise[]
-    setTemplates: React.Dispatch<React.SetStateAction<Template[]>>
+    exercises: Exercise[];
+    templates: Template[];
+    setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
     supabase: SupabaseClient;
     user: User | null;
 }
 
-
-export default function CreateTemplate({ exercises, setTemplates, supabase, user }: props) {
+export default function CreateTemplate({ exercises, templates, setTemplates, supabase, user }: props) {
     const [open, setOpen] = useState(false); // if the dialog is open
     const [step, setStep] = useState<view>("createTemplate"); // to conditionally render either the createTemplate form or the selectExercises form
     const [templateName, setTemplateName] = useState("");
@@ -61,15 +60,18 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
     const [loading, setLoading] = useState(false);
 
 
+    // reset all the template stuff when we open he modal
     function handleOpen() {
         setOpen(true);
+        setTemplateExercises([]);
+        setTemplateName("");
         setStep("createTemplate");
         setErrorMessage("");
     }
 
     function handleClose() {
         setOpen(false);
-        setStep("createTemplate");
+        //setStep("createTemplate");
     }
 
     function handleGoToSelectExercises() {
@@ -84,10 +86,10 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
     }
 
     // Reset template to blank when we open/close the create template modal
-    useEffect(() => {
-        setTemplateExercises([]);
-        setTemplateName("");
-    }, [open])
+    // useEffect(() => {
+    //     setTemplateExercises([]);
+    //     setTemplateName("");
+    // }, [open])
 
     // SelectExercises popup functions 
     useEffect(() => {
@@ -110,16 +112,27 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
         setExerciseSearch(newInput);
     }
 
-    // TODO: on submit we convert Exercise to Template Exercise to store in Supabase
+    // TODO: on submit we convert Exercise to TemplateExercise to store in Supabase
     async function handleCreateTemplate(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!user) return;
 
-        const name = templateName.trim();
-        if (!name || templateExercises.length === 0) return;
+        const templateExerciseIds = templateExercises.map(e => e.id);
 
-        // ... DB insert logic here ...
-        console.log("Creating template:", name, templateExercises);
+        // Custom atomic function to insert workout_template and all template_exercises.
+        // Either all are successful or we undo everything.
+        const { error } = await supabase.rpc("create_template_with_exercises", {
+            template_name: templateName,
+            user_id: user.id,
+            exercise_ids: templateExerciseIds
+        })
+
+        if (error) {
+            console.error("Error creating workout template: ", error);
+            toast.error("Error creating template.");
+            return
+        }
+        toast.success("Template created successfully!")
 
         handleClose();
     }
@@ -134,7 +147,7 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                 {step === "createTemplate" &&
                     <DialogContent className="sm:max-w-md flex flex-col justify-between">
                         <DialogHeader>
-                            <DialogTitle className="text-center">Create New Workout Template</DialogTitle>
+                            <DialogTitle className="text-center">New Template</DialogTitle>
                             <DialogDescription className="text-center">
                                 Add exercises to this template to make it easier to log workouts.
                             </DialogDescription>
@@ -154,7 +167,7 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                                         setTemplateName(e.target.value)
                                         setErrorMessage("") // clear error while typing
                                     }}
-                                    className={`input w-full border rounded-md px-3 py-2 text-sm focus:outline-none ${errorMessage
+                                    className={`input template-name-input border-[#333333] w-full border rounded-md px-3 py-2 text-sm focus:outline-none ${errorMessage
                                         ? "border-red-500 focus:ring-red-400"
                                         : ""
                                         }`}
@@ -164,35 +177,54 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                                 )}
                             </div>
 
-                            <DialogClose>
-                                <div className="flex ">
-                                    <button
-                                        className="text-sm bg-blue-400 w-fit px-2 py-1 rounded-md disabled:bg-gray-600 disabled:cursor-default cursor-pointer"
-                                        type="submit"
-                                        disabled={!templateName.trim() || (templateExercises.length < 1)}
-                                    >
-                                        Create
-                                    </button>
-                                </div>
-                            </DialogClose>
-                            {(<ul>
-                                {templateExercises.map((templateExercise) => (
-                                    <li key={templateExercise.id}>
-                                        <div className="flex justify-between m-2">
-                                            {templateExercise.name}
-                                            <RiDeleteBinLine onClick={() => handleRemoveTemplateExercise(templateExercise.id)} />
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                            )}
-                            <button
-                                type="button"
-                                className="button mb-3"
-                                onClick={handleGoToSelectExercises}
-                            >
-                                Add Exercises
-                            </button>
+                            <div className="flex justify-between items-center mt-2">
+                                <h3 className="">Exercises</h3>
+                                <button
+                                    type="button"
+                                    className="button"
+                                    onClick={handleGoToSelectExercises}
+                                >
+                                    Add Exercises
+                                </button>
+
+                            </div>
+                            <div className="template-exercises border rounded-lg p-2">
+                                {templateExercises.length > 0 ?
+                                    <ul className="flex flex-col divide-y divide-white/10">
+                                        {templateExercises.map((templateExercise) => (
+                                            <li
+                                                key={templateExercise.id}
+                                                className="flex justify-between items-center py-2 px-3 rounded-md transition-colors"
+                                            >
+                                                <span className="text-sm font-medium">{templateExercise.name}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveTemplateExercise(templateExercise.id)}
+                                                    className="text-gray-500 hover:text-red-400 transition-colors hover:cursor-pointer"
+                                                    title="Remove exercise"
+                                                >
+                                                    <RiDeleteBinLine className="w-4 h-4" />
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    :
+                                    <div className="flex justify-center items-center h-30">
+                                        <p className="text-gray-500">No Exercises.</p>
+                                    </div>
+                                }
+                            </div>
+
+                            <div className="flex w-full border-t-[#333333] ">
+                                <button
+                                    className="button w-full"
+                                    type="submit"
+                                    disabled={!templateName.trim() || (templateExercises.length < 1)}
+                                >
+                                    Save
+                                </button>
+                            </div>
+
                         </form>
                     </DialogContent>
                 }
@@ -256,7 +288,7 @@ export default function CreateTemplate({ exercises, setTemplates, supabase, user
                     </DialogContent>
                 }
             </Dialog>
-        </div>
+        </div >
     )
 }
 
