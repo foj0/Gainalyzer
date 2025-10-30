@@ -179,10 +179,9 @@ export default function TemplateTable() {
                                             key={t.id}
                                             supabase={supabase}
                                             user={user}
-                                            templateName={t.name}
+                                            template={t}
                                             templateExercises={t.template_exercises}
-                                            onEdit={() => handleEdit(t.id)}
-                                            onDelete={() => handleDelete(t.id)}
+                                            setTemplates={setTemplates}
                                         />
                                     ))}
                                 </div>

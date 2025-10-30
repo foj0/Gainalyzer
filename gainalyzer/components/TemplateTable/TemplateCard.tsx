@@ -6,34 +6,75 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import DeleteTemplateAlert from "./DeleteTemplateAlert";
+import { toast } from "sonner";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { RxCross2 } from "react-icons/rx";
+import { Tooltip } from 'react-tooltip';
 
 type TemplateExercise = {
     id: string;
     template_id: string;
     exercise_id: string;
     name: string;
-};
+}
+
+type Template = {
+    id: string;
+    name: string;
+    template_exercises: TemplateExercise[];
+}
 
 type Props = {
     supabase: SupabaseClient;
     user: User;
-    templateName: string;
+    template: Template;
     templateExercises: TemplateExercise[];
-    onEdit?: () => void;
-    onDelete?: () => void;
+    setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
 };
 
 export default function TemplateCard({
     supabase,
     user,
-    templateName,
+    template,
     templateExercises,
-    onEdit,
-    onDelete,
+    setTemplates
 }: Props) {
     // Only show first 5 exercises
     const displayedExercises = templateExercises.slice(0, 5);
     const exerciseList = displayedExercises.map((ex) => ex.name).join(", ");
+
+    async function handleDelete() {
+        if (!user) return;
+
+        // will also delete any related template_exercise rows by cascading on foreign key
+        const { error } = await supabase
+            .from("workout_templates")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("id", template.id);
+
+        if (error) {
+            console.error("Error deleting template: ", error);
+            toast.error("Failed to delete template.");
+            return;
+        } else {
+            setTemplates((prev) => prev.filter((t) => t.id !== template.id));
+            toast.success("Template deleted successfully!");
+        }
+    }
+
 
     return (
         <div
@@ -42,7 +83,7 @@ export default function TemplateCard({
         >
             {/* Header */}
             <div className="flex justify-between items-start mb-1">
-                <h3 className="text-lg truncate">{templateName}</h3>
+                <h3 className="text-lg truncate">{template.name}</h3>
 
                 {/* Edit/Delete menu */}
                 <DropdownMenu>
@@ -51,9 +92,32 @@ export default function TemplateCard({
                             <MoreVertical className="w-4 h-4 text-gray-400" />
                         </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-[#1a1a1a] border border-gray-700">
-                        <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
+                    <DropdownMenuContent
+                        align="end"
+                        className="bg-[#1a1a1a] border border-gray-700"
+                    >
+                        <DropdownMenuItem onClick={() => { return; }}>Edit</DropdownMenuItem>
+
+                        {/* Delete alert integrated cleanly */}
+                        <DeleteTemplateAlert
+                            supabase={supabase}
+                            user={user}
+                            template={template}
+                            setTemplates={setTemplates}
+                        >
+                            <DropdownMenuItem
+                                className="hover:cursor-pointer flex items-center"
+                                onSelect={(e) => e.preventDefault()}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+
+                                <div className="flex items-end gap-1 hover:cursor-pointer">
+                                    <RxCross2 className="text-red-500" />
+                                    <p>Delete</p>
+                                </div>
+                            </DropdownMenuItem>
+                        </DeleteTemplateAlert>
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -66,6 +130,6 @@ export default function TemplateCard({
                 {exerciseList}
                 {templateExercises.length > 5 ? ", ..." : ""}
             </p>
-        </div>
+        </div >
     );
 }
