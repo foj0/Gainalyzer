@@ -273,6 +273,9 @@ and works easily now.
 * Edit template works now
 * Was a lot harder than I thought it would be, given that it's almost the 
 same as CreateTemplate.
+* Did click the card to view, but had issues with propagation bubbling up and opening
+the wrong things. So changed to just add view to the dropdown and show the list of all
+exercises in the template.
 * Now need to implement the logs page to let you add a template and add all of the
 exercises in the template quickly.
 

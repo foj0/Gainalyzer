@@ -36,6 +36,8 @@ import { RxCross2 } from "react-icons/rx";
 import { Tooltip } from 'react-tooltip';
 import { BiEditAlt } from "react-icons/bi";
 import EditTemplate from "./EditTemplate";
+import ViewTemplate from "./ViewTemplate";
+import { FaRegEye } from "react-icons/fa";
 
 type TemplateExercise = {
     id: string;
@@ -72,107 +74,92 @@ export default function TemplateCard({
     const [editOpen, setEditOpen] = useState(false);
 
     return (
-        <Dialog>
-            <DialogTrigger>
-                <div
-                    className="relative bg-white/5 border border-white/10 rounded-2xl p-4 h-[150px] w-[150px]
-                              hover:bg-white/10 transition-all shadow-sm cursor-pointer"
-                >
-                    {/* Header */}
-                    <div className="flex justify-between items-start mb-1">
-                        <h1 className="text-lg truncate">{template.name}</h1>
+        <div>
+            <div
+                className="relative bg-white/5 border border-white/10 rounded-2xl p-4 h-[150px] w-[150px]
+                              hover:bg-white/10 transition-all shadow-sm "
+            >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-1">
+                    <h1 className="text-lg truncate">{template.name}</h1>
 
-                        {/* Edit/Delete menu */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <MoreVertical className="w-4 h-4 text-gray-400" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                className="template-dropdown-menu"
+                    {/* Edit/Delete menu */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <MoreVertical className="w-4 h-4 text-gray-400" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="template-dropdown-menu"
+                        >
+                            <ViewTemplate
+                                template={template}
+                                templateExercises={templateExercises}
                             >
-                                <EditTemplate
-                                    supabase={supabase}
-                                    user={user}
-                                    template={template}
-                                    templateExercises={templateExercises}
-                                    setTemplateExercises={setTemplateExercises}
-                                    setTemplates={setTemplates}
+                                <DropdownMenuItem
+                                    className="hover:cursor-pointer flex items-center"
+                                    onSelect={(e) => e.preventDefault()}
+                                    onClick={(e) => e.stopPropagation()}
                                 >
-                                    <DropdownMenuItem
-                                        className="hover:cursor-pointer flex items-center"
-                                        onSelect={(e) => e.preventDefault()}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <div className="flex items-end gap-1 hover:cursor-pointer">
-                                            <BiEditAlt className="text-blue-400 hover:cursor-pointer" />
-                                            <p>Edit</p>
-                                        </div>
-                                    </DropdownMenuItem>
-                                </EditTemplate>
-
-                                <DeleteTemplateAlert
-                                    supabase={supabase}
-                                    user={user}
-                                    template={template}
-                                    setTemplates={setTemplates}
+                                    <div className="flex items-end gap-1 hover:cursor-pointer">
+                                        <FaRegEye className="text-orange-300" />
+                                        <p>View</p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </ViewTemplate>
+                            <EditTemplate
+                                supabase={supabase}
+                                user={user}
+                                template={template}
+                                templateExercises={templateExercises}
+                                setTemplateExercises={setTemplateExercises}
+                                setTemplates={setTemplates}
+                            >
+                                <DropdownMenuItem
+                                    className="hover:cursor-pointer flex items-center"
+                                    onSelect={(e) => e.preventDefault()}
+                                    onClick={(e) => e.stopPropagation()}
                                 >
-                                    <DropdownMenuItem
-                                        className="hover:cursor-pointer flex items-center"
-                                        onSelect={(e) => e.preventDefault()}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <div className="flex items-end gap-1 hover:cursor-pointer">
-                                            <RxCross2 className="text-red-500" />
-                                            <p>Delete</p>
-                                        </div>
-                                    </DropdownMenuItem>
-                                </DeleteTemplateAlert>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                                    <div className="flex items-end gap-1 hover:cursor-pointer">
+                                        <BiEditAlt className="text-blue-400 hover:cursor-pointer" />
+                                        <p>Edit</p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </EditTemplate>
 
-                    {/* Exercise list */}
-                    <p
-                        className="text-left text-sm text-gray-500 whitespace-pre-wrap break-words overflow-hidden 
-        text-ellipsis line-clamp-5"
-                    >
-                        {exerciseList}
-                        {templateExercises.length > 5 ? ", ..." : ""}
-                    </p>
-                </div >
-
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md flex flex-col justify-between">
-                <DialogHeader>
-                    <DialogTitle className="text-center">{template.name}</DialogTitle>
-                    <DialogDescription className="text-center">
-                    </DialogDescription>
-                </DialogHeader>
-
-                <div
-                    className="flex flex-col gap-4 flex-1 justify-center"
-                >
-                    <div className="template-exercises rounded-lg p-2">
-                        {templateExercises.length > 0 ?
-                            <ul className="flex flex-col ">
-                                {template.template_exercises.map((templateExercise) => (
-                                    <li
-                                        key={templateExercise.id}
-                                        className="flex justify-between items-center py-2 px-3 rounded-md transition-colors"
-                                    >
-                                        <span className="">{templateExercise.name}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            :
-                            <div className="flex justify-center items-center h-30">
-                                <p className="text-gray-500">No Exercises.</p>
-                            </div>
-                        }
-                    </div>
+                            <DeleteTemplateAlert
+                                supabase={supabase}
+                                user={user}
+                                template={template}
+                                setTemplates={setTemplates}
+                            >
+                                <DropdownMenuItem
+                                    className="hover:cursor-pointer flex items-center"
+                                    onSelect={(e) => e.preventDefault()}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <div className="flex items-end gap-1 hover:cursor-pointer">
+                                        <RxCross2 className="text-red-500" />
+                                        <p>Delete</p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DeleteTemplateAlert>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
-            </DialogContent>
-        </Dialog>
+
+                {/* Exercise list */}
+                <p
+                    className="text-left text-sm text-gray-500 whitespace-pre-wrap break-words overflow-hidden 
+        text-ellipsis line-clamp-5"
+                >
+                    {exerciseList}
+                    {templateExercises.length > 5 ? ", ..." : ""}
+                </p>
+            </div >
+
+
+
+        </div >
     );
 }
