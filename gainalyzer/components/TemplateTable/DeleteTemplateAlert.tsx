@@ -57,24 +57,10 @@ export default function DeleteTemplateAlert({ user, supabase, template, setTempl
         }
     }
 
-
-    // <div className="flex justify-center hover:cursor-pointer">
-    //     <a id="Delete" className="w-full">
-    //         <div className="flex items-center gap-1">
-    //             <RiDeleteBinLine className="text-gray-500 hover:cursor-pointer" />
-    //             <p>Delete</p>
-    //         </div>
-    //     </a>
-    //     <Tooltip
-    //         anchorSelect="#Delete"
-    //         content="Delete template"
-    //     />
-    // </div>
-
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                {/* You can pass any React node as the trigger use asChild */}
+                {/* You can pass any React node as the trigger using asChild */}
                 {children}
             </AlertDialogTrigger>
             <AlertDialogContent>

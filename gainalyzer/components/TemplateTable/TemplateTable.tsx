@@ -142,15 +142,6 @@ export default function TemplateTable() {
         setExerciseSearch(newInput);
     }
 
-    function handleEdit(id: string) {
-        return;
-    }
-
-    function handleDelete(id: string) {
-        return;
-    }
-
-
     return (
         <div>
             {user ? (

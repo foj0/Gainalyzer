@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react"
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CreditCard, Apple, Wallet } from "lucide-react";
 import {
     Dialog,
     DialogTrigger,
@@ -15,13 +9,6 @@ import {
     DialogTitle,
     DialogDescription,
     DialogClose,
-    InnerDialog,
-    InnerDialogTrigger,
-    InnerDialogContent,
-    InnerDialogHeader,
-    InnerDialogFooter,
-    InnerDialogTitle,
-    InnerDialogDescription,
 } from "@/components/ui/dialog"
 
 import { createClient } from "@/utils/supabase/client"

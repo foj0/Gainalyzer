@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BsChevronDown } from "react-icons/bs";
 import { TbLoader2 } from "react-icons/tb";
 import { SupabaseClient, User } from "@supabase/supabase-js";
@@ -16,12 +16,11 @@ type ExerciseRowProps = {
     supabase: SupabaseClient;
     user: User | null;
     exercise: Exercise;
-    templateExercises: Exercise[];
     selectedExercises: Exercise[];
     setSelectedExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
 }
 
-export default function ExerciseSelectRow({ supabase, user, exercise, templateExercises, selectedExercises, setSelectedExercises }: ExerciseRowProps) {
+export default function ExerciseSelectRow({ supabase, user, exercise, selectedExercises, setSelectedExercises }: ExerciseRowProps) {
     const [logs, setLogs] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -111,7 +110,7 @@ export default function ExerciseSelectRow({ supabase, user, exercise, templateEx
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {logs.map((log) => (
+                                    {logs.map((log: any) => (
                                         <tr key={log.logs.id}>
                                             <td className="px-6 py-2">{log.logs?.log_date}</td>
                                             <td className="px-6 py-2">{log.weight}</td>

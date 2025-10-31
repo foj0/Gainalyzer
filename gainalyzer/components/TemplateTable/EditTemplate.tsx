@@ -9,14 +9,15 @@ import {
     DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog"
-import { toast } from "sonner"
-import { SupabaseClient, User } from "@supabase/supabase-js"
+import { SupabaseClient, User } from "@supabase/supabase-js";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { toast } from "sonner";
 import { Search } from "lucide-react";
 import { TbLoader2 } from "react-icons/tb";
 import ExerciseSelectRow from "../ExercisePopupSelector/ExerciseSelectRow";
+import { initial } from "lodash";
 
-type view = "createTemplate" | "selectExercises";
+type view = "editTemplate" | "selectExercises";
 
 type Exercise = {
     id: string;
@@ -38,49 +39,96 @@ type Template = {
 }
 
 type props = {
-    exercises: Exercise[];
-    templates: Template[];
+    template: Template;
+    templateExercises: TemplateExercise[];
+    setTemplateExercises: React.Dispatch<React.SetStateAction<TemplateExercise[]>>;
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
     supabase: SupabaseClient;
     user: User | null;
+    children: React.ReactNode;
 }
 
-export default function CreateTemplate({ exercises, templates, setTemplates, supabase, user }: props) {
-    const [open, setOpen] = useState(false); // if the dialog is open
-    const [step, setStep] = useState<view>("createTemplate"); // to conditionally render either the createTemplate form or the selectExercises form
-    const [templateName, setTemplateName] = useState("");
-    const [templateExercises, setTemplateExercises] = useState<Exercise[]>([]); // exercises added to this template
-    const [errorMessage, setErrorMessage] = useState("");
 
+// TODO: We need to pass in the templateExercises, Template Name, to preset that in the template view.
+// And set the templateExercises as selected.
+// Don't think we need templates passed as a prop? Just templates.
+// I think what we do is:
+// Create a newTemplateExercises[] and init them to be whatever the template.template_exercises is.
+// Then as we add/delete exercises from the template we update this. When we finally hit save we override
+// this template with matching template ID with the new template.
+
+const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, children }: props) => {
+    if (!user) return;
+    const [open, setOpen] = useState(false); // if the dialog is open
+    const [step, setStep] = useState<view>("editTemplate"); // to conditionally render either the editTemplate form or the selectExercises form
+    const [exercises, setExercises] = useState([]);
+    const [templateName, setTemplateName] = useState(template.name);
+
+    // NOTE: We first edit/add/delete exercises from the template as type Exercise.
+    // We convert them to type TemplateExercise in the edit handler where we
+    // update the database.
+
+    // Map the templateExercises into type Exercise so we can set the selectedExercises to them
+    const initialExercises = templateExercises.map((te: TemplateExercise) => ({
+        id: te.exercise_id,
+        user_id: user.id,
+        name: te.name,
+    }));
+    // New array of template exercises that we'll update. Initialize as the starting set of exercises.
+    const [newTemplateExercises, setNewTemplateExercises] = useState<Exercise[]>(initialExercises);
+    const [selectedExercises, setSelectedExercises] = useState<Exercise[]>(initialExercises);
     const [exerciseSearch, setExerciseSearch] = useState<string>("")
     const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
-    const [selectedExercises, setSelectedExercises] = useState<Exercise[]>(templateExercises);
+    const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
+    // fetch user exercises
+    useEffect(() => {
+        async function fetchExercises() {
+            if (!user) return;
 
-    // reset all the template stuff when we open he modal
+            const { data, error } = await supabase
+                .from("exercises")
+                .select("*")
+                .eq("user_id", user.id)
+                .order("name", { ascending: true });
+
+            if (error) {
+                console.error(error);
+            } else if (data) {
+                setExercises((data as any).map((ex: any) => ({
+                    id: ex.id,
+                    user_id: ex.user_id,
+                    name: ex.name
+                })))
+            }
+        }
+
+        fetchExercises();
+    }, []);
+
+    // reset all the template stuff when we open the modal
     function handleOpen() {
         setOpen(true);
-        setTemplateExercises([]);
-        setTemplateName("");
-        setStep("createTemplate");
+        setNewTemplateExercises(initialExercises);
+        setTemplateName(template.name);
+        setStep("editTemplate");
         setErrorMessage("");
     }
 
     function handleClose() {
         setOpen(false);
-        //setStep("createTemplate");
     }
 
     function handleGoToSelectExercises() {
         // Initialize selector with current exercises
-        setSelectedExercises(templateExercises);
+        setSelectedExercises(newTemplateExercises);
         setStep("selectExercises");
     }
 
 
     function handleRemoveTemplateExercise(id: string) {
-        setTemplateExercises(prev => prev.filter(ex => ex.id != id));
+        setNewTemplateExercises(prev => prev.filter(ex => ex.id != id));
     }
 
     // SelectExercises popup functions 
@@ -95,8 +143,8 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
 
     // When we press "Save" button to submit. Not just clicking the checkbox.
     function handleSaveExercises() {
-        setTemplateExercises(selectedExercises);
-        setStep("createTemplate");
+        setNewTemplateExercises(selectedExercises);
+        setStep("editTemplate");
     }
 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -104,27 +152,34 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
         setExerciseSearch(newInput);
     }
 
-    // TODO: on submit we convert Exercise to TemplateExercise to store in Supabase
-    async function handleCreateTemplate(e: React.FormEvent<HTMLFormElement>) {
+    async function handleEditTemplate(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!user) return;
 
-        const templateExerciseIds = templateExercises.map(e => e.id);
+        const templateExerciseIds = newTemplateExercises.map(e => e.id);
 
         // Custom atomic function to insert workout_template and all template_exercises.
         // Either all are successful or we undo everything.
-        const { error } = await supabase.rpc("create_template_with_exercises", {
-            template_name: templateName,
-            user_id: user.id,
-            exercise_ids: templateExerciseIds
-        })
+        // We convert the Exercises into TemplateExercises?
+        const { data, error } = await supabase.rpc("update_template_with_exercises", {
+            p_template_id: template.id,
+            p_template_name: templateName,
+            p_exercise_ids: templateExerciseIds,
+        });
 
         if (error) {
-            console.error("Error creating workout template: ", error);
-            toast.error("Error creating template.");
+            console.error("Error editing workout template: ", error);
+            toast.error("Error editing template.");
             return
         }
-        toast.success("Template created successfully!")
+
+
+        if (data) {
+            console.log(data);
+            toast.success("Template updated successfully!");
+            setTemplates(prev => prev.map(t => t.id === data.id ? data : t));
+            setTemplateExercises(data.template_exercises);
+        }
 
         handleClose();
     }
@@ -133,20 +188,21 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <button className="button mb-3" onClick={handleOpen}>Create Template</button>
+                    {/* <button className="button mb-3" onClick={handleOpen}>Edit Template</button> */}
+                    {children}
                 </DialogTrigger>
 
-                {step === "createTemplate" &&
+                {step === "editTemplate" &&
                     <DialogContent className="sm:max-w-md flex flex-col justify-between">
                         <DialogHeader>
-                            <DialogTitle className="text-center">New Template</DialogTitle>
+                            <DialogTitle className="text-center">Edit Template</DialogTitle>
                             <DialogDescription className="text-center">
                                 Add exercises to this template to make it easier to log workouts.
                             </DialogDescription>
                         </DialogHeader>
 
                         <form
-                            onSubmit={handleCreateTemplate}
+                            onSubmit={handleEditTemplate}
                             className="flex flex-col gap-4 flex-1 justify-center"
                         >
                             <div className="flex flex-1 flex-col">
@@ -183,7 +239,7 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
                             <div className="template-exercises border rounded-lg p-2">
                                 {templateExercises.length > 0 ?
                                     <ul className="flex flex-col divide-y divide-white/10">
-                                        {templateExercises.map((templateExercise) => (
+                                        {newTemplateExercises.map((templateExercise) => (
                                             <li
                                                 key={templateExercise.id}
                                                 className="flex justify-between items-center py-2 px-3 rounded-md transition-colors"
@@ -266,7 +322,7 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
                         <DialogFooter>
                         </DialogFooter>
                         <div className="flex justify-center w-full mt-3">
-                            <button className="text-sm bg-gray-500 px-2 py-1 rounded-md" onClick={() => setStep("createTemplate")}>
+                            <button className="text-sm bg-gray-500 px-2 py-1 rounded-md" onClick={() => setStep("editTemplate")}>
                                 Cancel
                             </button>
                             <button
@@ -279,7 +335,8 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
                     </DialogContent>
                 }
             </Dialog>
-        </div >
-    )
+        </div>
+    );
 }
 
+export default EditTemplate;

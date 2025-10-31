@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { MoreVertical } from "lucide-react";
 import {
@@ -22,6 +23,8 @@ import { toast } from "sonner";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { RxCross2 } from "react-icons/rx";
 import { Tooltip } from 'react-tooltip';
+import { BiEditAlt } from "react-icons/bi";
+import EditTemplate from "./EditTemplate";
 
 type TemplateExercise = {
     id: string;
@@ -48,10 +51,11 @@ export default function TemplateCard({
     supabase,
     user,
     template,
-    templateExercises,
+    //templateExercises,
     setTemplates
 }: Props) {
     // Only show first 5 exercises
+    const [templateExercises, setTemplateExercises] = useState<TemplateExercise[]>(template.template_exercises);
     const displayedExercises = templateExercises.slice(0, 5);
     const exerciseList = displayedExercises.map((ex) => ex.name).join(", ");
 
@@ -96,9 +100,27 @@ export default function TemplateCard({
                         align="end"
                         className="bg-[#1a1a1a] border border-gray-700"
                     >
-                        <DropdownMenuItem onClick={() => { return; }}>Edit</DropdownMenuItem>
+                        <EditTemplate
+                            supabase={supabase}
+                            user={user}
+                            template={template}
+                            templateExercises={templateExercises}
+                            setTemplateExercises={setTemplateExercises}
+                            setTemplates={setTemplates}
+                        >
+                            <DropdownMenuItem
+                                className="hover:cursor-pointer flex items-center"
+                                onSelect={(e) => e.preventDefault()}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="flex items-end gap-1 hover:cursor-pointer">
+                                    <BiEditAlt className="text-gray-500 hover:cursor-pointer" />
+                                    <p>Edit</p>
+                                </div>
+                            </DropdownMenuItem>
+                        </EditTemplate>
 
-                        {/* Delete alert integrated cleanly */}
+
                         <DeleteTemplateAlert
                             supabase={supabase}
                             user={user}
@@ -110,14 +132,12 @@ export default function TemplateCard({
                                 onSelect={(e) => e.preventDefault()}
                                 onClick={(e) => e.stopPropagation()}
                             >
-
                                 <div className="flex items-end gap-1 hover:cursor-pointer">
                                     <RxCross2 className="text-red-500" />
                                     <p>Delete</p>
                                 </div>
                             </DropdownMenuItem>
                         </DeleteTemplateAlert>
-
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
