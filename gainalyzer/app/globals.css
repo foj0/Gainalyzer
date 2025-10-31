@@ -623,7 +623,7 @@ thead th {
 }
 
 .template-exercises {
-    background-color: var(--popover);
+    /* background-color: var(--popover); */
     border: 1px solid var(--border);
 }
 
@@ -636,6 +636,19 @@ thead th {
 }
 
 .dialog-custom-border {
+    border: 1px solid var(--border);
+}
+
+.template-dropdown-trigger {
+    background-color: var(--card);
+}
+
+.template-dropdown-trigger:hover {
+    background-color: var(--accent);
+}
+
+.template-dropdown-menu {
+    background-color: var(--card);
     border: 1px solid var(--border);
 }
 

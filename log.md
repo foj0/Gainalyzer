@@ -266,6 +266,16 @@ and works easily now.
 ## 10-29:
 * template grid
 
+## 10-30:
+* Added delete function and delete alert to template cards
+
+## 10-31:
+* Edit template works now
+* Was a lot harder than I thought it would be, given that it's almost the 
+same as CreateTemplate.
+* Now need to implement the logs page to let you add a template and add all of the
+exercises in the template quickly.
+
 
 ### todo:
 * After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?

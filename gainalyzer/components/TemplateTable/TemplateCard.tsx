@@ -2,6 +2,17 @@ import { useState } from "react";
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { MoreVertical } from "lucide-react";
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+    DialogClose,
+} from "@/components/ui/dialog"
+
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -51,105 +62,117 @@ export default function TemplateCard({
     supabase,
     user,
     template,
-    //templateExercises,
     setTemplates
 }: Props) {
+
     // Only show first 5 exercises
     const [templateExercises, setTemplateExercises] = useState<TemplateExercise[]>(template.template_exercises);
     const displayedExercises = templateExercises.slice(0, 5);
     const exerciseList = displayedExercises.map((ex) => ex.name).join(", ");
-
-    async function handleDelete() {
-        if (!user) return;
-
-        // will also delete any related template_exercise rows by cascading on foreign key
-        const { error } = await supabase
-            .from("workout_templates")
-            .delete()
-            .eq("user_id", user.id)
-            .eq("id", template.id);
-
-        if (error) {
-            console.error("Error deleting template: ", error);
-            toast.error("Failed to delete template.");
-            return;
-        } else {
-            setTemplates((prev) => prev.filter((t) => t.id !== template.id));
-            toast.success("Template deleted successfully!");
-        }
-    }
-
+    const [editOpen, setEditOpen] = useState(false);
 
     return (
-        <div
-            className="relative bg-white/5 border border-white/10 rounded-2xl p-4 h-[150px] w-[150px]
-      hover:bg-white/10 transition-all shadow-sm cursor-pointer"
-        >
-            {/* Header */}
-            <div className="flex justify-between items-start mb-1">
-                <h3 className="text-lg truncate">{template.name}</h3>
+        <Dialog>
+            <DialogTrigger>
+                <div
+                    className="relative bg-white/5 border border-white/10 rounded-2xl p-4 h-[150px] w-[150px]
+                              hover:bg-white/10 transition-all shadow-sm cursor-pointer"
+                >
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-1">
+                        <h1 className="text-lg truncate">{template.name}</h1>
 
-                {/* Edit/Delete menu */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <button className="p-1 hover:bg-white/10 rounded-md">
-                            <MoreVertical className="w-4 h-4 text-gray-400" />
-                        </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        align="end"
-                        className="bg-[#1a1a1a] border border-gray-700"
-                    >
-                        <EditTemplate
-                            supabase={supabase}
-                            user={user}
-                            template={template}
-                            templateExercises={templateExercises}
-                            setTemplateExercises={setTemplateExercises}
-                            setTemplates={setTemplates}
-                        >
-                            <DropdownMenuItem
-                                className="hover:cursor-pointer flex items-center"
-                                onSelect={(e) => e.preventDefault()}
-                                onClick={(e) => e.stopPropagation()}
+                        {/* Edit/Delete menu */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <MoreVertical className="w-4 h-4 text-gray-400" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="end"
+                                className="template-dropdown-menu"
                             >
-                                <div className="flex items-end gap-1 hover:cursor-pointer">
-                                    <BiEditAlt className="text-gray-500 hover:cursor-pointer" />
-                                    <p>Edit</p>
-                                </div>
-                            </DropdownMenuItem>
-                        </EditTemplate>
+                                <EditTemplate
+                                    supabase={supabase}
+                                    user={user}
+                                    template={template}
+                                    templateExercises={templateExercises}
+                                    setTemplateExercises={setTemplateExercises}
+                                    setTemplates={setTemplates}
+                                >
+                                    <DropdownMenuItem
+                                        className="hover:cursor-pointer flex items-center"
+                                        onSelect={(e) => e.preventDefault()}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <div className="flex items-end gap-1 hover:cursor-pointer">
+                                            <BiEditAlt className="text-blue-400 hover:cursor-pointer" />
+                                            <p>Edit</p>
+                                        </div>
+                                    </DropdownMenuItem>
+                                </EditTemplate>
 
+                                <DeleteTemplateAlert
+                                    supabase={supabase}
+                                    user={user}
+                                    template={template}
+                                    setTemplates={setTemplates}
+                                >
+                                    <DropdownMenuItem
+                                        className="hover:cursor-pointer flex items-center"
+                                        onSelect={(e) => e.preventDefault()}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <div className="flex items-end gap-1 hover:cursor-pointer">
+                                            <RxCross2 className="text-red-500" />
+                                            <p>Delete</p>
+                                        </div>
+                                    </DropdownMenuItem>
+                                </DeleteTemplateAlert>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
 
-                        <DeleteTemplateAlert
-                            supabase={supabase}
-                            user={user}
-                            template={template}
-                            setTemplates={setTemplates}
-                        >
-                            <DropdownMenuItem
-                                className="hover:cursor-pointer flex items-center"
-                                onSelect={(e) => e.preventDefault()}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <div className="flex items-end gap-1 hover:cursor-pointer">
-                                    <RxCross2 className="text-red-500" />
-                                    <p>Delete</p>
-                                </div>
-                            </DropdownMenuItem>
-                        </DeleteTemplateAlert>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-
-            {/* Exercise list */}
-            <p
-                className="text-sm text-gray-500 whitespace-pre-wrap break-words overflow-hidden 
+                    {/* Exercise list */}
+                    <p
+                        className="text-left text-sm text-gray-500 whitespace-pre-wrap break-words overflow-hidden 
         text-ellipsis line-clamp-5"
-            >
-                {exerciseList}
-                {templateExercises.length > 5 ? ", ..." : ""}
-            </p>
-        </div >
+                    >
+                        {exerciseList}
+                        {templateExercises.length > 5 ? ", ..." : ""}
+                    </p>
+                </div >
+
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md flex flex-col justify-between">
+                <DialogHeader>
+                    <DialogTitle className="text-center">{template.name}</DialogTitle>
+                    <DialogDescription className="text-center">
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div
+                    className="flex flex-col gap-4 flex-1 justify-center"
+                >
+                    <div className="template-exercises rounded-lg p-2">
+                        {templateExercises.length > 0 ?
+                            <ul className="flex flex-col ">
+                                {template.template_exercises.map((templateExercise) => (
+                                    <li
+                                        key={templateExercise.id}
+                                        className="flex justify-between items-center py-2 px-3 rounded-md transition-colors"
+                                    >
+                                        <span className="">{templateExercise.name}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                            :
+                            <div className="flex justify-center items-center h-30">
+                                <p className="text-gray-500">No Exercises.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }

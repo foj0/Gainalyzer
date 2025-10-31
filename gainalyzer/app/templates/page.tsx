@@ -28,7 +28,7 @@ export default async function TemplatesPage() {
             <div className="md:pl-[200px] xl:pl-[300px]">
 
                 {/* Main content area */}
-                <main className="max-w-screen 2xl:max-w-6/12 mx-auto mt-16 md:mt-0 space-y-6">
+                <main className="max-w-screen 2xl:max-w-6/12 mx-auto mt-16 md:mt-0 space-y-6 p-2">
                     {/* <main className="max-w-screen mx-auto mt-16 md:mt-0 space-y-6"> */}
                     <TemplateTable />
                 </main>

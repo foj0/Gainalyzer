@@ -48,18 +48,9 @@ type props = {
     children: React.ReactNode;
 }
 
-
-// TODO: We need to pass in the templateExercises, Template Name, to preset that in the template view.
-// And set the templateExercises as selected.
-// Don't think we need templates passed as a prop? Just templates.
-// I think what we do is:
-// Create a newTemplateExercises[] and init them to be whatever the template.template_exercises is.
-// Then as we add/delete exercises from the template we update this. When we finally hit save we override
-// this template with matching template ID with the new template.
-
 const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, children }: props) => {
     if (!user) return;
-    const [open, setOpen] = useState(false); // if the dialog is open
+    const [open, setOpen] = useState(false);
     const [step, setStep] = useState<view>("editTemplate"); // to conditionally render either the editTemplate form or the selectExercises form
     const [exercises, setExercises] = useState([]);
     const [templateName, setTemplateName] = useState(template.name);
@@ -67,13 +58,15 @@ const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTe
     // NOTE: We first edit/add/delete exercises from the template as type Exercise.
     // We convert them to type TemplateExercise in the edit handler where we
     // update the database.
+    // So we're basically creating a new template and replacing the old one.
 
-    // Map the templateExercises into type Exercise so we can set the selectedExercises to them
+    // Map the templateExercises into type Exercise so we can initialize newTemplateExercises and selectedExercises.
     const initialExercises = templateExercises.map((te: TemplateExercise) => ({
         id: te.exercise_id,
         user_id: user.id,
         name: te.name,
     }));
+
     // New array of template exercises that we'll update. Initialize as the starting set of exercises.
     const [newTemplateExercises, setNewTemplateExercises] = useState<Exercise[]>(initialExercises);
     const [selectedExercises, setSelectedExercises] = useState<Exercise[]>(initialExercises);
@@ -125,7 +118,6 @@ const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTe
         setSelectedExercises(newTemplateExercises);
         setStep("selectExercises");
     }
-
 
     function handleRemoveTemplateExercise(id: string) {
         setNewTemplateExercises(prev => prev.filter(ex => ex.id != id));
@@ -188,7 +180,6 @@ const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTe
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    {/* <button className="button mb-3" onClick={handleOpen}>Edit Template</button> */}
                     {children}
                 </DialogTrigger>
 
