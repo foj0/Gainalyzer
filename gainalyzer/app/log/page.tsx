@@ -8,6 +8,7 @@ import {
 import Sidebar from "@/components/Sidebar/Sidebar"
 import { useLogInputs } from "@/hooks/useLogInputs";
 import { AddExercise } from "@/components/AddExercise/AddExercise";
+import { NewAddExercise } from "@/components/AddExercise/NewAddExercise";
 import { ExerciseCard } from "@/components/ExerciseCard/ExerciseCard";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
@@ -198,6 +199,13 @@ export default function LogPage() {
         ]);
     }
 
+    // new function to add multiple exercises at once.
+    // Maybe add a template exercises which can be null. if null then we know
+    // we're adding exercises otherwise we know we're adding a template
+    function handleAddExercises(exercises: DbExercise[]) {
+        return;
+    }
+
     // --- Updating an exercise field ---
     function handleExerciseChange(id: string, field: string, value: string) {
         setExercises((prev) =>
@@ -372,7 +380,8 @@ export default function LogPage() {
                         )}
                         {/* Add Exercise Button */}
                         <div className={`absolute left-0 right-0 bottom-0 mb-2 ${exercises.length > 0 ? "mt-8" : ""}`}>
-                            <AddExercise onAdd={handleAddExercise} />
+                            {/* <AddExercise onAdd={handleAddExercise} /> */}
+                            <NewAddExercise supabase={supabase} user={user} exercises={dbExercises} onAdd={handleAddExercises} />
                         </div>
                     </div>
 

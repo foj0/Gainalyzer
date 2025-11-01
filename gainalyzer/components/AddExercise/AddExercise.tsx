@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { ExerciseCombobox } from "@/components/ExerciseCombobox/ExerciseCombobox";
 import { NewExercise } from "./NewExercise";
 import { createClient } from "@/utils/supabase/client"
+import AddTemplate from "./AddTemplate";
 
 const supabase = createClient();
 
@@ -81,9 +82,14 @@ export const AddExercise = ({ onAdd }: { onAdd: (exercise: ExerciseOption) => vo
 
                     <div className="flex flex-col gap-2">
 
-                        {/* Create New Exercise Dialog */}
-                        <NewExercise exercises={exercises} setExercises={setExercises} setRefreshKey={setRefreshKey}
-                        />
+                        <div className="">
+                            <div className="flex">
+                                <NewExercise exercises={exercises} setExercises={setExercises} setRefreshKey={setRefreshKey}
+                                />
+                                &nbsp;or
+                            </div>
+                            {/* <AddTemplate /> */}
+                        </div>
 
                         <form onSubmit={handleAdd} className="flex flex-col">
                             <ExerciseCombobox

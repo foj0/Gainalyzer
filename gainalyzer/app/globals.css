@@ -652,6 +652,27 @@ thead th {
     border: 1px solid var(--border);
 }
 
+.tabs {
+    /* background-color: var(--card); */
+    border-radius: 12px;
+    /* border: 1px solid var(--border); */
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.tab {
+    padding: 2px 6px 2px 6px;
+    border: 1px solid transparent;
+    color: oklch(0.7 0.02 255);
+}
+
+.tab-selected {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--card);
+    color: var(--foreground);
+}
+
 /* Light & Dark mode defaults */
 :root {
     --radius: 0.625rem;

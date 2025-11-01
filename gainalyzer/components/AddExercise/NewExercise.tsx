@@ -87,7 +87,7 @@ export const NewExercise = ({ exercises, setExercises, setRefreshKey }: NewExerc
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <button className="text-blue-400 cursor-pointer">New</button>
+                    <button className="text-blue-500 cursor-pointer hover:underline">Create New</button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md h-[250px] flex flex-col justify-between">
                     <DialogHeader>

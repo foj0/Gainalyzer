@@ -278,9 +278,14 @@ the wrong things. So changed to just add view to the dropdown and show the list 
 exercises in the template.
 * Now need to implement the logs page to let you add a template and add all of the
 exercises in the template quickly.
+* Started new exercise tab dialog in log page
 
 
 ### todo:
+* I want to change the add exercise to be a different modal.
+    - Open a modal with 2 tabs "Exercises" and "Templates"
+    - if you choose exercises then we see the select exercise table and we can add any number of exercises.
+    - On the templates tab we can choose a template and then add it. Then it adds all the templates exercises to the log.
 * After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?
 * Fix goal section colors in light mode
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.
