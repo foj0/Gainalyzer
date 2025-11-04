@@ -673,6 +673,10 @@ thead th {
     color: var(--foreground);
 }
 
+.custom-border-color {
+    border: 1px solid var(--border)
+}
+
 /* Light & Dark mode defaults */
 :root {
     --radius: 0.625rem;

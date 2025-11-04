@@ -83,7 +83,7 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {logs.map((log) => (
+                                    {logs.map((log: any) => (
                                         <tr key={log.logs.id}>
                                             <td className="px-6 py-2">{log.logs?.log_date}</td>
                                             <td className="px-6 py-2">{log.weight}</td>

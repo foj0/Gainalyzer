@@ -106,7 +106,6 @@ export default function CreateTemplate({ open, onClose, exercises, templates, se
         setExerciseSearch(newInput);
     }
 
-    // TODO: on submit we convert Exercise to TemplateExercise to store in Supabase
     async function handleCreateTemplate(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!user) return;

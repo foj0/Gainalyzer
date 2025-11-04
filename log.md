@@ -280,8 +280,13 @@ exercises in the template.
 exercises in the template quickly.
 * Started new exercise tab dialog in log page
 
+## 11-3:
+* finished the new add exercise and template to log.
+* Maybe still need to make it look prettier but it works.
+
 
 ### todo:
+* Need to instantly load new template on creation. I thought I had this? Idk
 * I want to change the add exercise to be a different modal.
     - Open a modal with 2 tabs "Exercises" and "Templates"
     - if you choose exercises then we see the select exercise table and we can add any number of exercises.

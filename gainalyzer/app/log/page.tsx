@@ -18,8 +18,9 @@ const supabase = createClient();
 
 // Exercise in user library (DB)
 type DbExercise = {
-    id: string  // UUID from DB
-    name: string
+    id: string;  // UUID from DB
+    user_id: string;
+    name: string;
 }
 
 // Exercise in log (UI only)
@@ -46,6 +47,8 @@ export default function LogPage() {
 
     // --- Exercises added to this log ---
     const [exercises, setExercises] = useState<LogExercise[]>([]);
+
+
 
     // fetch user once on mount
     useEffect(() => {
@@ -381,7 +384,7 @@ export default function LogPage() {
                         {/* Add Exercise Button */}
                         <div className={`absolute left-0 right-0 bottom-0 mb-2 ${exercises.length > 0 ? "mt-8" : ""}`}>
                             {/* <AddExercise onAdd={handleAddExercise} /> */}
-                            <NewAddExercise supabase={supabase} user={user} exercises={dbExercises} onAdd={handleAddExercises} />
+                            <NewAddExercise logExercises={exercises} setLogExercises={setExercises} supabase={supabase} user={user} onAdd={handleAddExercises} />
                         </div>
                     </div>
 
