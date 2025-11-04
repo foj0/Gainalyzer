@@ -284,6 +284,9 @@ exercises in the template quickly.
 * finished the new add exercise and template to log.
 * Maybe still need to make it look prettier but it works.
 
+## 11-4:
+* Creating template immediately updates and shows new template card.
+
 
 ### todo:
 * Need to instantly load new template on creation. I thought I had this? Idk

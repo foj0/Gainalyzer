@@ -71,6 +71,7 @@ export default function TemplateCard({
     const [templateExercises, setTemplateExercises] = useState<TemplateExercise[]>(template.template_exercises);
     const displayedExercises = templateExercises.slice(0, 5);
     const exerciseList = displayedExercises.map((ex) => ex.name).join(", ");
+    const [viewOpen, setViewOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
 
     return (
@@ -95,10 +96,12 @@ export default function TemplateCard({
                             <ViewTemplate
                                 template={template}
                                 templateExercises={templateExercises}
+                                open={viewOpen}
+                                setOpen={setViewOpen}
                             >
                                 <DropdownMenuItem
                                     className="hover:cursor-pointer flex items-center"
-                                    onSelect={(e) => e.preventDefault()}
+                                    onSelect={(e) => { e.preventDefault() }}
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <div className="flex items-end gap-1 hover:cursor-pointer">

@@ -26,11 +26,12 @@ type Template = {
 type Props = {
     template: Template;
     templateExercises: TemplateExercise[];
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     children: React.ReactNode;
 }
 
-const ViewTemplate = ({ template, templateExercises, children }: Props) => {
-    const [open, setOpen] = useState(false);
+const ViewTemplate = ({ template, templateExercises, open, setOpen, children }: Props) => {
     return (
         <div>
             <Dialog open={open} onOpenChange={setOpen}>

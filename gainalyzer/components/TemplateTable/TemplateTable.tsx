@@ -132,11 +132,6 @@ export default function TemplateTable() {
         fetchTemplates();
     }, [user]);
 
-    // TODO: Need to do something to refresh when a template is edited/deleted
-    // useEffect(() => {
-    //     fetchTemplates();
-    // }, [templates])
-
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const newInput: string = e.target.value;
         setExerciseSearch(newInput);

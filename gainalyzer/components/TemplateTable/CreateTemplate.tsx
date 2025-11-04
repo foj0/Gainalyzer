@@ -114,7 +114,7 @@ export default function CreateTemplate({ open, onClose, exercises, templates, se
 
         // Custom atomic function to insert workout_template and all template_exercises.
         // Either all are successful or we undo everything.
-        const { error } = await supabase.rpc("create_template_with_exercises", {
+        const { data, error } = await supabase.rpc("create_template_with_exercises", {
             template_name: templateName,
             user_id: user.id,
             exercise_ids: templateExerciseIds
@@ -125,7 +125,14 @@ export default function CreateTemplate({ open, onClose, exercises, templates, se
             toast.error("Error creating template.");
             return
         }
-        toast.success("Template created successfully!")
+
+        if (data && data.length > 0) {
+            const newTemplate = data[0];
+
+            // Update UI immediately
+            setTemplates(prev => [...prev, newTemplate]);
+            toast.success("Template created successfully!")
+        }
 
         handleClose();
     }
