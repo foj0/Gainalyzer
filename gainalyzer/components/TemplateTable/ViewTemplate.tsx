@@ -28,17 +28,12 @@ type Props = {
     templateExercises: TemplateExercise[];
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    children: React.ReactNode;
 }
 
-const ViewTemplate = ({ template, templateExercises, open, setOpen, children }: Props) => {
+const ViewTemplate = ({ template, templateExercises, open, setOpen }: Props) => {
     return (
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                    {children}
-                </DialogTrigger>
-
                 <DialogContent className="sm:max-w-md flex flex-col justify-between">
                     <DialogHeader>
                         <DialogTitle className="text-center mb-3">{template.name}</DialogTitle>

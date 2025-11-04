@@ -286,6 +286,7 @@ exercises in the template quickly.
 
 ## 11-4:
 * Creating template immediately updates and shows new template card.
+* Fixed template card dropdown menu not closing on menu item select.
 
 
 ### todo:

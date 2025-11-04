@@ -71,8 +71,10 @@ export default function TemplateCard({
     const [templateExercises, setTemplateExercises] = useState<TemplateExercise[]>(template.template_exercises);
     const displayedExercises = templateExercises.slice(0, 5);
     const exerciseList = displayedExercises.map((ex) => ex.name).join(", ");
+    const [menuOpen, setMenuOpen] = useState(false);
     const [viewOpen, setViewOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
 
     return (
         <div>
@@ -85,7 +87,7 @@ export default function TemplateCard({
                     <h1 className="text-lg truncate">{template.name}</h1>
 
                     {/* Edit/Delete menu */}
-                    <DropdownMenu>
+                    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                         <DropdownMenuTrigger asChild>
                             <MoreVertical className="w-4 h-4 text-gray-400" />
                         </DropdownMenuTrigger>
@@ -93,60 +95,49 @@ export default function TemplateCard({
                             align="end"
                             className="template-dropdown-menu"
                         >
-                            <ViewTemplate
-                                template={template}
-                                templateExercises={templateExercises}
-                                open={viewOpen}
-                                setOpen={setViewOpen}
+                            <DropdownMenuItem
+                                className="hover:cursor-pointer flex items-center"
+                                onSelect={(e) => {
+                                    e.preventDefault();
+                                    setMenuOpen(false); // 👈 CLOSE MENU
+                                    setViewOpen(true);   // 👈 OPEN DIALOG
+                                }}
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <DropdownMenuItem
-                                    className="hover:cursor-pointer flex items-center"
-                                    onSelect={(e) => { e.preventDefault() }}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <div className="flex items-end gap-1 hover:cursor-pointer">
-                                        <FaRegEye className="text-orange-300" />
-                                        <p>View</p>
-                                    </div>
-                                </DropdownMenuItem>
-                            </ViewTemplate>
-                            <EditTemplate
-                                supabase={supabase}
-                                user={user}
-                                template={template}
-                                templateExercises={templateExercises}
-                                setTemplateExercises={setTemplateExercises}
-                                setTemplates={setTemplates}
+                                <div className="flex items-end gap-1 hover:cursor-pointer">
+                                    <FaRegEye className="text-orange-300" />
+                                    <p>View</p>
+                                </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="hover:cursor-pointer flex items-center"
+                                onSelect={(e) => {
+                                    e.preventDefault();
+                                    setMenuOpen(false); // 👈 CLOSE MENU
+                                    setEditOpen(true);   // 👈 OPEN DIALOG
+                                }}
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <DropdownMenuItem
-                                    className="hover:cursor-pointer flex items-center"
-                                    onSelect={(e) => e.preventDefault()}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <div className="flex items-end gap-1 hover:cursor-pointer">
-                                        <BiEditAlt className="text-blue-400 hover:cursor-pointer" />
-                                        <p>Edit</p>
-                                    </div>
-                                </DropdownMenuItem>
-                            </EditTemplate>
+                                <div className="flex items-end gap-1 hover:cursor-pointer">
+                                    <BiEditAlt className="text-blue-400 hover:cursor-pointer" />
+                                    <p>Edit</p>
+                                </div>
+                            </DropdownMenuItem>
 
-                            <DeleteTemplateAlert
-                                supabase={supabase}
-                                user={user}
-                                template={template}
-                                setTemplates={setTemplates}
+                            <DropdownMenuItem
+                                className="hover:cursor-pointer flex items-center"
+                                onSelect={(e) => {
+                                    e.preventDefault();
+                                    setMenuOpen(false);
+                                    setDeleteOpen(true);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <DropdownMenuItem
-                                    className="hover:cursor-pointer flex items-center"
-                                    onSelect={(e) => e.preventDefault()}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <div className="flex items-end gap-1 hover:cursor-pointer">
-                                        <RxCross2 className="text-red-500" />
-                                        <p>Delete</p>
-                                    </div>
-                                </DropdownMenuItem>
-                            </DeleteTemplateAlert>
+                                <div className="flex items-end gap-1 hover:cursor-pointer">
+                                    <RxCross2 className="text-red-500" />
+                                    <p>Delete</p>
+                                </div>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -161,8 +152,32 @@ export default function TemplateCard({
                 </p>
             </div >
 
-
+            <ViewTemplate
+                template={template}
+                templateExercises={templateExercises}
+                open={viewOpen}
+                setOpen={setViewOpen}
+            />
+            <EditTemplate
+                supabase={supabase}
+                user={user}
+                template={template}
+                templateExercises={templateExercises}
+                setTemplateExercises={setTemplateExercises}
+                setTemplates={setTemplates}
+                open={editOpen}
+                setOpen={setEditOpen}
+            />
+            <DeleteTemplateAlert
+                supabase={supabase}
+                user={user}
+                template={template}
+                setTemplates={setTemplates}
+                open={deleteOpen}
+                setOpen={setDeleteOpen}
+            />
 
         </div >
+
     );
 }

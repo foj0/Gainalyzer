@@ -45,12 +45,12 @@ type props = {
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
     supabase: SupabaseClient;
     user: User | null;
-    children: React.ReactNode;
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, children }: props) => {
+const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, open, setOpen }: props) => {
     if (!user) return;
-    const [open, setOpen] = useState(false);
     const [step, setStep] = useState<view>("editTemplate"); // to conditionally render either the editTemplate form or the selectExercises form
     const [exercises, setExercises] = useState([]);
     const [templateName, setTemplateName] = useState(template.name);
@@ -179,10 +179,6 @@ const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTe
     return (
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                    {children}
-                </DialogTrigger>
-
                 {step === "editTemplate" &&
                     <DialogContent className="sm:max-w-md flex flex-col justify-between">
                         <DialogHeader>

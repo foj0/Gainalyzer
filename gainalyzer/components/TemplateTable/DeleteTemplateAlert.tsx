@@ -32,10 +32,11 @@ type props = {
     supabase: SupabaseClient;
     template: Template;
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
-    children: React.ReactNode; // will be the <DropdownMenuItem>
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function DeleteTemplateAlert({ user, supabase, template, setTemplates, children }: props) {
+export default function DeleteTemplateAlert({ user, supabase, template, setTemplates, open, setOpen }: props) {
 
     async function handleDelete() {
         if (!user) return;
@@ -58,11 +59,7 @@ export default function DeleteTemplateAlert({ user, supabase, template, setTempl
     }
 
     return (
-        <AlertDialog>
-            <AlertDialogTrigger asChild>
-                {/* You can pass any React node as the trigger using asChild */}
-                {children}
-            </AlertDialogTrigger>
+        <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
