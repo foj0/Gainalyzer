@@ -89,7 +89,7 @@ export default function TemplateCard({
                     {/* Edit/Delete menu */}
                     <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                         <DropdownMenuTrigger asChild>
-                            <MoreVertical className="w-4 h-4 text-gray-400" />
+                            <MoreVertical className="w-4 h-4 text-gray-400 hover:cursor-pointer" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"
@@ -99,10 +99,9 @@ export default function TemplateCard({
                                 className="hover:cursor-pointer flex items-center"
                                 onSelect={(e) => {
                                     e.preventDefault();
-                                    setMenuOpen(false); // 👈 CLOSE MENU
-                                    setViewOpen(true);   // 👈 OPEN DIALOG
+                                    setMenuOpen(false);
+                                    setViewOpen(true);
                                 }}
-                                onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="flex items-end gap-1 hover:cursor-pointer">
                                     <FaRegEye className="text-orange-300" />
@@ -113,10 +112,9 @@ export default function TemplateCard({
                                 className="hover:cursor-pointer flex items-center"
                                 onSelect={(e) => {
                                     e.preventDefault();
-                                    setMenuOpen(false); // 👈 CLOSE MENU
-                                    setEditOpen(true);   // 👈 OPEN DIALOG
+                                    setMenuOpen(false);
+                                    setEditOpen(true);
                                 }}
-                                onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="flex items-end gap-1 hover:cursor-pointer">
                                     <BiEditAlt className="text-blue-400 hover:cursor-pointer" />
@@ -131,7 +129,6 @@ export default function TemplateCard({
                                     setMenuOpen(false);
                                     setDeleteOpen(true);
                                 }}
-                                onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="flex items-end gap-1 hover:cursor-pointer">
                                     <RxCross2 className="text-red-500" />

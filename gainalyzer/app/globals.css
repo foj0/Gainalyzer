@@ -677,6 +677,12 @@ thead th {
     border: 1px solid var(--border)
 }
 
+.profile-section {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+}
+
 /* Light & Dark mode defaults */
 :root {
     --radius: 0.625rem;

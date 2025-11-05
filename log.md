@@ -287,14 +287,13 @@ exercises in the template quickly.
 ## 11-4:
 * Creating template immediately updates and shows new template card.
 * Fixed template card dropdown menu not closing on menu item select.
+* CreateTemplate dialog now closes after saving and creating a template.
+
+## 11-5:
+* Profile page redesigned and working
 
 
 ### todo:
-* Need to instantly load new template on creation. I thought I had this? Idk
-* I want to change the add exercise to be a different modal.
-    - Open a modal with 2 tabs "Exercises" and "Templates"
-    - if you choose exercises then we see the select exercise table and we can add any number of exercises.
-    - On the templates tab we can choose a template and then add it. Then it adds all the templates exercises to the log.
 * After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?
 * Fix goal section colors in light mode
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.

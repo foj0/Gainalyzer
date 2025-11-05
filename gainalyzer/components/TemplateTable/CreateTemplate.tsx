@@ -38,8 +38,6 @@ type Template = {
 }
 
 type props = {
-    open: boolean;
-    onClose: () => void;
     exercises: Exercise[];
     templates: Template[];
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
@@ -47,8 +45,8 @@ type props = {
     user: User | null;
 }
 
-export default function CreateTemplate({ open, onClose, exercises, templates, setTemplates, supabase, user }: props) {
-    // const [open, setOpen] = useState(false); // if the dialog is open
+export default function CreateTemplate({ exercises, templates, setTemplates, supabase, user }: props) {
+    const [open, setOpen] = useState(false); // if the dialog is open
     const [step, setStep] = useState<view>("createTemplate"); // to conditionally render either the createTemplate form or the selectExercises form
     const [templateName, setTemplateName] = useState("");
     const [templateExercises, setTemplateExercises] = useState<Exercise[]>([]); // exercises added to this template
@@ -70,8 +68,8 @@ export default function CreateTemplate({ open, onClose, exercises, templates, se
     }
 
     function handleClose() {
-        // setOpen(false);
-        //setStep("createTemplate");
+        setOpen(false);
+        setStep("createTemplate");
     }
 
     function handleGoToSelectExercises() {
@@ -139,7 +137,7 @@ export default function CreateTemplate({ open, onClose, exercises, templates, se
 
     return (
         <div>
-            <Dialog open={open} onOpenChange={onClose}>
+            <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                     <button className="button mb-3" onClick={handleOpen}>Create Template</button>
                 </DialogTrigger>

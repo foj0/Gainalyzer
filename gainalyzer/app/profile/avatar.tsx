@@ -63,7 +63,7 @@ export default function Avatar({
     }
 
     return (
-        <div>
+        <div className="flex pb-2">
             {avatarUrl ? (
                 <Image
                     width={size}
@@ -78,7 +78,7 @@ export default function Avatar({
             )}
             <div style={{ width: size }}>
                 <label className="button primary block" htmlFor="single">
-                    {uploading ? 'Uploading ...' : 'Upload'}
+                    {uploading ? 'Uploading ...' : 'Change Photo'}
                 </label>
                 <input
                     style={{
