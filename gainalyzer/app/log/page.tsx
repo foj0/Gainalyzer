@@ -12,6 +12,7 @@ import { NewAddExercise } from "@/components/AddExercise/NewAddExercise";
 import { ExerciseCard } from "@/components/ExerciseCard/ExerciseCard";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { convertForDisplay, convertForSaving } from "@/utils/units";
 
 // create client once at module scope
 const supabase = createClient();
@@ -33,14 +34,18 @@ type LogExercise = {
     notes: string       // maps to log_exercises.notes
 }
 
+function lbsToKg(lbs: number) {
+    return lbs * 0.45359237;
+}
+
 export default function LogPage() {
 
     const [user, setUser] = useState<any>(null);
+    const [units, setUnits] = useState<string>("");
 
     // --- Date and user input ---
     const [date, setDate] = useState<Date | undefined>(new Date());
     const { weight, setWeight, calories, setCalories, protein, setProtein } = useLogInputs();
-    const [weightMetric, setWeightMetric] = useState("lbs");
 
     // --- Exercises created in the user's library ---
     const [dbExercises, setDbExercises] = useState<DbExercise[]>([]);
@@ -48,21 +53,51 @@ export default function LogPage() {
     // --- Exercises added to this log ---
     const [exercises, setExercises] = useState<LogExercise[]>([]);
 
-
-
-    // fetch user once on mount
+    // fetch user and their preferred measurment units on mount
     useEffect(() => {
         async function loadUser() {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
+            const { data: { user }, error: user_error } = await supabase.auth.getUser();
+            if (user_error) {
+                console.log("Error fetching user", user_error);
+                return;
+            }
+            if (user) {
+                setUser(user);
+                const { data, error: units_error } = await supabase
+                    .from("profiles")
+                    .select("units")
+                    .eq("id", user.id)
+                    .single();
+                if (units_error) {
+                    console.log("Error fetching preferred units", units_error);
+                    return;
+                }
+                if (data) {
+                    console.log(data.units, "hello")
+                    setUnits(data.units);
+                }
+            }
+
         }
         loadUser();
     }, []);
 
+    useEffect(() => {
+        console.log(units, "units changed")
+
+    }, [units])
+
     async function fetchLogForDate(selectedDate: Date) {
         if (!user) return;
 
-        const logDate = selectedDate.toISOString().split("T")[0];
+        console.log(selectedDate);
+        // manually construct the date to avoid timezone issues
+        const logDate = [
+            selectedDate.getFullYear(),
+            String(selectedDate.getMonth() + 1).padStart(2, "0"),
+            String(selectedDate.getDate()).padStart(2, "0"),
+        ].join("-");
+        console.log(logDate);
 
         const { data: log, error } = await supabase
             .from("logs")
@@ -89,9 +124,19 @@ export default function LogPage() {
             return;
         }
 
+        // Helper conversion functions to convert from lbs to kg
+        const convertFromBase = (lbs: number | null) => {
+            if (lbs === null || lbs === undefined) return "";
+            if (units === "kg") {
+                return (lbs * 0.45359237).toFixed(1); // to string
+            }
+            // since weight is already in lbs just return that, no need to convert
+            return lbs.toString();
+        };
+
         if (log) {
             // Populate weight and calories and protein
-            setWeight(log.bodyweight?.toString() ?? "");
+            setWeight(convertFromBase(log.bodyweight)); // bodyweight converted to users preffered units
             setCalories(log.calories?.toString() ?? "");
             setProtein(log.protein?.toString() ?? "");
 
@@ -103,7 +148,7 @@ export default function LogPage() {
                         id: le.id,             // use log_exercises id as UI key
                         exercise_id: exercise.id, // UUID from exercises table
                         name: exercise.name,
-                        weight: le.weight?.toString() ?? "",
+                        weight: convertFromBase(le.weight),
                         reps: le.reps?.toString() ?? "",
                         notes: le.notes || ""
                     } as LogExercise;
@@ -120,14 +165,26 @@ export default function LogPage() {
 
     // Refetch log whenever the date changes and user is loaded
     useEffect(() => {
+        if (!user || !units) return;  // ensure units is loaded first so we load the correct units
         if (date && user) fetchLogForDate(date);
-    }, [date, user]);
+    }, [user, units, date]);
+
 
     // --- Save log to DB ---
     async function handleSaveLog() {
         if (!user || !date) return;
 
-        const logDate = date.toISOString().split("T")[0];
+        const logDate = [
+            date.getFullYear(),
+            String(date.getMonth() + 1).padStart(2, "0"),
+            String(date.getDate()).padStart(2, "0"),
+        ].join("-");
+
+        function convertToBase(value: string) {
+            const num = parseFloat(value);
+            if (isNaN(num)) return null;
+            return units === "kg" ? Number((num / 0.45359237).toFixed(1)) : num;
+        }
 
         try {
             // 1️⃣ Upsert the main log row (user_id + log_date)
@@ -137,7 +194,7 @@ export default function LogPage() {
                     {
                         user_id: user.id,
                         log_date: logDate,
-                        bodyweight: weight || null,
+                        bodyweight: convertToBase(weight),
                         calories: calories || null,
                         protein: protein || null,
                     },
@@ -164,7 +221,7 @@ export default function LogPage() {
                         exercises.map((ex) => ({
                             log_id: logData.id,
                             exercise_id: ex.exercise_id, // DB UUID
-                            weight: ex.weight ? parseFloat(ex.weight) : null,
+                            weight: convertToBase(ex.weight),
                             reps: ex.reps ? parseInt(ex.reps) : null,
                             notes: ex.notes || null,
                         }))
@@ -319,7 +376,7 @@ export default function LogPage() {
                         <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 sm:gap-8 px-4 py-2 max-w-xl mx-auto">
 
                             {[
-                                { id: "bodyweight", label: "Weight", value: weight, unit: weightMetric, onBlur: handleWeightBlur, maxLength: 6 },
+                                { id: "bodyweight", label: "Weight", value: weight, unit: units, onBlur: handleWeightBlur, maxLength: 6 },
                                 { id: "calories", label: "Calories", value: calories, unit: "cal", maxLength: 5 },
                                 { id: "protein", label: "Protein", value: protein, unit: "g", maxLength: 5 },
                             ].map((item) => (
@@ -368,6 +425,7 @@ export default function LogPage() {
                                             notes={exercise.notes}
                                             onChange={handleExerciseChange}
                                             onDelete={handleExerciseDelete}
+                                            units={units}
                                         />
                                     ))}
                                 </div>

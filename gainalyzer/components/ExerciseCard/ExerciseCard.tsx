@@ -2,27 +2,28 @@ import { XIcon } from "lucide-react"
 
 // Exercise in log (UI only)
 type LogExercise = {
-    id: string        // log_exercises.id - unique per log entry
-    exercise_id: string // real exercise UUID
-    name: string
-    weight: string      // maps to log_exercises.weight
-    reps: string        // maps to log_exercises.reps
-    notes: string       // maps to log_exercises.notes
+    id: string;          // log_exercises.id - unique per log entry
+    exercise_id: string; // real exercise UUID
+    name: string;
+    weight: string;      // maps to log_exercises.weight
+    reps: string;        // maps to log_exercises.reps
+    notes: string;       // maps to log_exercises.notes
 }
 
 type ExerciseCardProps = {
-    id: string // log_exercise id (UI key)
-    name: string
-    weight: string
-    reps: string
-    notes: string
+    id: string; // log_exercise id (UI key)
+    name: string;
+    weight: string;
+    reps: string;
+    notes: string;
     // onChange: (id: string, field: string, value: string) => void
-    onChange: (id: string, field: keyof Omit<LogExercise, 'id' | 'exercise_id' | 'name'>, value: string) => void
-    onDelete: (id: string) => void
+    onChange: (id: string, field: keyof Omit<LogExercise, 'id' | 'exercise_id' | 'name'>, value: string) => void;
+    onDelete: (id: string) => void;
+    units: string;
 }
 
 export function ExerciseCard({
-    id, name, weight, reps, notes, onChange, onDelete,
+    id, name, weight, reps, notes, onChange, onDelete, units
 }: ExerciseCardProps) {
 
     // Validation for inputs
@@ -68,8 +69,7 @@ export function ExerciseCard({
                 <div className="flex justify-center">
                     <div className="flex flex-col w-35 items-center gap-2">
                         <div>
-                            {/* TODO: load dynamic weight metric */}
-                            lbs
+                            {units}
                         </div>
                         <input
                             id="weight"

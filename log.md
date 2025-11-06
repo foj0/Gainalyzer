@@ -291,6 +291,8 @@ exercises in the template quickly.
 
 ## 11-5:
 * Profile page redesigned and working
+* User can set their preferred units (lbs or kg)
+* Log page can convert to lbs or kg depending on account settings. Database default is lbs.
 
 
 ### todo:
