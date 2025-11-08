@@ -78,7 +78,7 @@ export default function Dashboard() {
     const supabase = createClient();
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
-    const [units, setUnits] = useState<string | null>(null);
+    const [units, setUnits] = useState<string>("");
     const [fullName, setFullName] = useState<string>("");
     const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
     const [logs, setLogs] = useState<Log[]>([]);
@@ -517,7 +517,7 @@ export default function Dashboard() {
                                             <p className="text-sm mb-2">Start: {convertFromBase(Number(bodyweightStart))} {units}</p>
                                             <p className="text-sm mb-2">Goal: {convertFromBase(Number(bodyweightGoal))} {units}</p>
                                         </div>
-                                        <ProgressBar value={(Number(quickStats?.currentBodyweight) / Number(bodyweightGoal))} label={Number(quickStats?.currentBodyweight).toFixed(1)} />
+                                        <ProgressBar value={(Number(quickStats?.currentBodyweight) / Number(bodyweightGoal))} label={Number(convertFromBase(Number(quickStats?.currentBodyweight))).toFixed(1)} />
                                         <p className="text-sm mt-1 text-gray-400">{bwProgDesc}</p>
                                         <p className="text-sm mt-1 text-gray-400">{`${(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} ${units} to go!`}</p>
                                     </div>
@@ -540,7 +540,7 @@ export default function Dashboard() {
                                     <h3 className="text-lg font-semibold mb-3">Daily Calorie Goal</h3>
                                     <div className="flex flex-1 justify-center items-center gap-8 sm:gap-8">
                                         <div className="flex w-30 items-center mb-4">
-                                            <CircularProgressbarWithChildren minValue={0} maxValue={goalsRef.current.get("calories")?.target_value ?? 0} value={quickStats?.calories ?? 0}
+                                            <CircularProgressbarWithChildren minValue={0} maxValue={goalsRef.current.get("calories")?.target_value ?? 0} value={quickStats?.todaysCalories ?? 0}
                                                 styles={buildStyles({
                                                     pathColor: '#3b82f6',   // filled (progress) part — Tailwind blue-500
                                                     trailColor: '#1e2939',  // unfilled / empty ring — your desired gray
@@ -670,7 +670,7 @@ export default function Dashboard() {
                         <h2 className="text-lg font-semibold mb-1">Progress and Analysis</h2>
                         <div className="flex flex-col lg:flex-row justify-center gap-6">
                             {/* <BodyweightChart logs={logs} /> */}
-                            <ExerciseBodyweightChart logs={logs} userExercises={userExercises} />
+                            <ExerciseBodyweightChart logs={logs} userExercises={userExercises} units={units} />
 
                             <AiAnalysisSection selectedExercise={"Bench Press"} />
 

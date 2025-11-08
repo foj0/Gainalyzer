@@ -36,7 +36,7 @@ interface ChartData {
     yTickCount: number;
 }
 
-export default function ExerciseBodyweightChart({ logs, userExercises }: { logs: Log[], userExercises: { id: string, name: string }[] | null }) {
+export default function ExerciseBodyweightChart({ logs, userExercises, units }: { logs: Log[], userExercises: { id: string, name: string }[] | null, units: string }) {
     const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "180d" | "365d" | "all">("all");
     const [selectedExercise, setSelectedExercise] = useState<string>("");
     const [isMobile, setIsMobile] = useState(false);
@@ -99,23 +99,29 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
         // 2️⃣ filter logs within date range
         const filteredLogs = sortedLogs.filter((log) => new Date(log.log_date) >= startDate);
 
+        // 🔹 helper conversion function
+        function convertFromBase(value: number | null): number | null {
+            if (value == null) return null;
+            return units === "kg" ? +(value * 0.45359237).toFixed(1) : value;
+        }
+
         // 3️⃣ convert to ExerciseLog for the selected exercise
         const exerciseLogs: ExerciseLog[] = filteredLogs.map((log) => {
             const exercise = log.exercises.find((ex) => ex.name === selectedExercise);
+            const convertedWeight = exercise?.weight != null ? convertFromBase(exercise.weight) : null;
             let strength: number | null = null;
 
-            if (exercise?.weight != null && exercise?.reps != null) {
-                // Matt Brzycki 1RM formula
-                strength = exercise.weight / (1.0278 - 0.0278 * exercise.reps);
+            if (convertedWeight != null && exercise?.reps != null) {
+                strength = convertedWeight / (1.0278 - 0.0278 * exercise.reps);
             }
 
             return {
-                bodyweight: log.bodyweight,
+                bodyweight: convertFromBase(log.bodyweight),
                 log_date: log.log_date,
                 exercise_name: exercise?.name ?? null,
-                weight: exercise?.weight ?? null,
+                weight: convertedWeight,
                 reps: exercise?.reps ?? null,
-                strength,
+                strength: strength,
             };
         });
 
@@ -203,7 +209,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises }: { logs:
     const { filledLogs: preparedLogs, xTicks, bwDomain, exDomain, yTickCount } = chartData;
 
     const unitMap: Record<string, string> = {
-        bodyweight: "lbs",
+        bodyweight: units,
         calories: "kcal",
         reps: "reps",
     };
