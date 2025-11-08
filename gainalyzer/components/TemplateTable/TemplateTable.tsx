@@ -48,6 +48,7 @@ export default function TemplateTable() {
     const [exerciseSearch, setExerciseSearch] = useState<string>("")
     const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
     const [loading, setLoading] = useState(false);
+    const [units, setUnits] = useState<string | null>(null);
 
     async function fetchUser() {
         const { data: { user }, error } = await supabase.auth.getUser();
@@ -55,8 +56,21 @@ export default function TemplateTable() {
             console.error("Error fetching user: ", error);
             return;
         }
-        if (!user) return;
-        setUser(user);
+        if (user) {
+            setUser(user);
+            const { data, error: units_error } = await supabase
+                .from("profiles")
+                .select("units")
+                .eq("id", user.id)
+                .single();
+            if (units_error) {
+                console.log("Error fetching preferred units", units_error);
+                return;
+            }
+            if (data) {
+                setUnits(data.units);
+            }
+        }
     }
 
     async function fetchExercises() {
@@ -147,7 +161,7 @@ export default function TemplateTable() {
                             <h1 className="text-xl font-bold ">Workout Templates</h1>
                             <p className="text-sm text-gray-500 mb-3">Create and edit your own custom workouts.</p>
                         </div>
-                        <CreateTemplate exercises={exercises} templates={templates} setTemplates={setTemplates} supabase={supabase} user={user} />
+                        <CreateTemplate exercises={exercises} templates={templates} setTemplates={setTemplates} supabase={supabase} user={user} units={units} />
                     </div >
 
                     {/* List of user workout templates */}

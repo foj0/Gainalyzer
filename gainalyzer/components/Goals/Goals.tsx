@@ -18,6 +18,7 @@ type ExerciseOption = { id: string; name: string }
 
 export default function GoalsPage() {
     const [user, setUser] = useState<any>(null);
+    const [units, setUnits] = useState<string | null>(null);
     const [exercises, setExercises] = useState<ExerciseOption[]>([]);
 
     const [bodyweightStart, setBodyweightStart] = useState("");
@@ -28,12 +29,36 @@ export default function GoalsPage() {
     const [repsGoal, setRepsGoal] = useState("");
     const existingGoalsRef = useRef(new Map());
 
+    // Helper conversion functions to convert from lbs to kg
+    const convertFromBase = (lbs: number | null) => {
+        if (lbs === null || lbs === undefined) return "";
+        if (units === "kg") {
+            return (lbs * 0.45359237).toFixed(1); // to string
+        }
+        // since weight is already in lbs just return that, no need to convert
+        return lbs.toString();
+    };
+
     // fetch User and their Exercises to select from
     useEffect(() => {
         async function fetchUserAndExercises() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
-            setUser(user);
+            if (user) {
+                setUser(user);
+                const { data, error: units_error } = await supabase
+                    .from("profiles")
+                    .select("units")
+                    .eq("id", user.id)
+                    .single();
+                if (units_error) {
+                    console.log("Error fetching preferred units", units_error);
+                    return;
+                }
+                if (data) {
+                    setUnits(data.units);
+                }
+            }
 
             const { data, error } = await supabase
                 .from("exercises")
@@ -277,11 +302,11 @@ export default function GoalsPage() {
                             type="text"
                             placeholder="start"
                             className="w-24 text-right"
-                            value={bodyweightStart}
+                            value={convertFromBase(Number(bodyweightStart))}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                         />
-                        <span>lbs</span>
+                        <span>{units}</span>
                     </div>
                 </div>
                 <div className="flex flex-col">
@@ -292,11 +317,11 @@ export default function GoalsPage() {
                             type="text"
                             placeholder="target"
                             className="w-24 text-right"
-                            value={bodyweightGoal}
+                            value={convertFromBase(Number(bodyweightGoal))}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                         />
-                        <span>lbs</span>
+                        <span>{units}</span>
                     </div>
                 </div>
             </section>
@@ -346,7 +371,7 @@ export default function GoalsPage() {
                             type="text"
                             placeholder="weight"
                             className="w-20 text-right"
-                            value={weightGoal}
+                            value={convertFromBase(Number(weightGoal))}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                         />

@@ -78,6 +78,7 @@ export default function Dashboard() {
     const supabase = createClient();
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
+    const [units, setUnits] = useState<string | null>(null);
     const [fullName, setFullName] = useState<string>("");
     const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
     const [logs, setLogs] = useState<Log[]>([]);
@@ -94,6 +95,17 @@ export default function Dashboard() {
     const [strengthPR, setStrengthPR] = useState<StrengthPR | null>(null);
     const goalsRef = useRef(new Map());
 
+    // Helper conversion functions to convert from lbs to kg
+    const convertFromBase = (lbs: number | null) => {
+        if (lbs === null || lbs === undefined) return "";
+        if (units === "kg") {
+            return (lbs * 0.45359237).toFixed(1); // to string
+        }
+        // if weight is already in lbs just return that, no need to convert
+        return lbs.toString();
+    };
+
+
     // fetch user
     useEffect(() => {
         async function fetchUser() {
@@ -104,6 +116,18 @@ export default function Dashboard() {
                 ?.find((identity) => identity.identity_data?.full_name)
                 ?.identity_data?.full_name || "User";
             setFullName(userFullName);
+            const { data, error: units_error } = await supabase
+                .from("profiles")
+                .select("units")
+                .eq("id", user.id)
+                .single();
+            if (units_error) {
+                console.log("Error fetching preferred units", units_error);
+                return;
+            }
+            if (data) {
+                setUnits(data.units);
+            }
         }
         fetchUser();
 
@@ -349,9 +373,9 @@ export default function Dashboard() {
                     console.log("currentBW: ", quickStats?.currentBodyweight);
                     let bodyweightProgressDesc = ""
                     if (bodyweightProgress <= 0) {
-                        bodyweightProgressDesc = `+${Math.abs(bodyweightProgress).toFixed(1)} lbs from starting weight`
+                        bodyweightProgressDesc = `+${Math.abs(bodyweightProgress).toFixed(1)} ${units} from starting weight`
                     } else {
-                        bodyweightProgressDesc = `-${Math.abs(bodyweightProgress).toFixed(1)} lbs from starting weight`
+                        bodyweightProgressDesc = `-${Math.abs(bodyweightProgress).toFixed(1)} ${units} from starting weight`
                     }
                     setBwProgDesc(bodyweightProgressDesc);
                 }
@@ -373,7 +397,7 @@ export default function Dashboard() {
                     style={{ width: `${val}%` }}
                 >
                 </div>
-                <span className="absolute text-xs top-0 right-5">{label} lbs</span>
+                <span className="absolute text-xs top-0 right-5">{`${label} ${units}`}</span>
 
             </div >
         );
@@ -398,8 +422,8 @@ export default function Dashboard() {
                             <div>
                                 <h3 className="text-sm font-semibold">Current Weight</h3>
                                 <p className="text-lg font-medium">
-                                    {quickStats?.currentBodyweight ?? "N/A"}
-                                    <span> {quickStats?.currentBodyweight != null ? "lbs" : ""} </span>
+                                    {convertFromBase(Number(quickStats?.currentBodyweight)) ?? "N/A"}
+                                    <span> {quickStats?.currentBodyweight != null ? `${units}` : ""} </span>
                                 </p>
                                 {
                                     quickStats?.currentBodyweight != null ?
@@ -415,8 +439,8 @@ export default function Dashboard() {
                             <div>
                                 <h3 className="text-sm font-semibold">Avg Weight</h3>
                                 <p className="text-lg font-medium">
-                                    {quickStats?.avgBodyweight ?? "N/A"}
-                                    <span> {quickStats?.avgBodyweight != null ? "lbs" : ""} </span>
+                                    {convertFromBase(Number(quickStats?.avgBodyweight)) ?? "N/A"}
+                                    <span> {quickStats?.avgBodyweight != null ? `${units}` : ""} </span>
                                 </p>
                                 {
                                     quickStats?.avgBodyweight != null ?
@@ -490,12 +514,12 @@ export default function Dashboard() {
 
                                     <div className="flex flex-col flex-1 ">
                                         <div className="flex justify-between">
-                                            <p className="text-sm mb-2">Start: {bodyweightStart} lbs</p>
-                                            <p className="text-sm mb-2">Goal: {bodyweightGoal} lbs</p>
+                                            <p className="text-sm mb-2">Start: {convertFromBase(Number(bodyweightStart))} {units}</p>
+                                            <p className="text-sm mb-2">Goal: {convertFromBase(Number(bodyweightGoal))} {units}</p>
                                         </div>
                                         <ProgressBar value={(Number(quickStats?.currentBodyweight) / Number(bodyweightGoal))} label={Number(quickStats?.currentBodyweight).toFixed(1)} />
                                         <p className="text-sm mt-1 text-gray-400">{bwProgDesc}</p>
-                                        <p className="text-sm mt-1 text-gray-400">{(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} lbs to go!</p>
+                                        <p className="text-sm mt-1 text-gray-400">{`${(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} ${units} to go!`}</p>
                                     </div>
                                 </>
                                 :
@@ -585,7 +609,7 @@ export default function Dashboard() {
                                                     Target:
                                                 </p>
                                                 <p className="font-semibold text-gray-100">
-                                                    {goalsRef.current.get("strength")?.target_weight} lbs × {goalsRef.current.get("strength")?.target_reps} reps
+                                                    {convertFromBase(Number(goalsRef.current.get("strength")?.target_weight))} {units} × {goalsRef.current.get("strength")?.target_reps} reps
                                                 </p>
                                             </div>
 
@@ -593,7 +617,7 @@ export default function Dashboard() {
                                             <div className="flex justify-between text-sm border-b border-zinc-800 pb-2 mb-2">
                                                 <p className="text-gray-400">Estimated 1RM</p>
                                                 <p className="font-semibold">
-                                                    {(goalsRef.current.get("strength")?.target_weight / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps)).toFixed(0)} lbs
+                                                    {(Number(convertFromBase(Number(goalsRef.current.get("strength")?.target_weight) / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps))).toFixed(0))} {units}
                                                 </p>
                                             </div>
 
@@ -605,10 +629,10 @@ export default function Dashboard() {
                                                     <div className="flex justify-between items-center bg-zinc-800/50 px-3 py-2 rounded-lg border border-zinc-700">
                                                         <div>
                                                             <p className="text-sm text-gray-200">
-                                                                {strengthPR.set.weight} lbs × {strengthPR.set.reps} reps
+                                                                {convertFromBase(Number(strengthPR.set.weight))} {units} × {strengthPR.set.reps} reps
                                                             </p>
                                                             <p className="text-xs text-gray-400">
-                                                                Est. 1RM: <span className="text-gray-100 font-medium">{(strengthPR.ORM ?? 0).toFixed(0)} lbs</span>
+                                                                Est. 1RM: <span className="text-gray-100 font-medium">{(Number(convertFromBase(Number(strengthPR.ORM)) ?? 0).toFixed(0))} {units}</span>
                                                             </p>
                                                         </div>
 

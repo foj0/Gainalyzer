@@ -18,14 +18,26 @@ type ExerciseRowProps = {
     user: User | null;
     exercise: Exercise;
     setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+    units: string | null;
 }
 
-export default function ExerciseRow({ supabase, user, exercise, setExercises }: ExerciseRowProps) {
+export default function ExerciseRow({ supabase, user, exercise, setExercises, units }: ExerciseRowProps) {
     const [logs, setLogs] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const convertFromBase = (lbs: number | null) => {
+        if (lbs === null || lbs === undefined) return "";
+        if (units === "kg") {
+            return (lbs * 0.45359237).toFixed(1); // to string
+        }
+        // if weight is already in lbs just return that, no need to convert
+        return lbs.toString();
+    };
+
+
     async function toggleDropdown() {
+        console.log("units", units);
         if (!user) return;
         setOpen(!open);
         if (!open && logs.length === 0) {
@@ -78,7 +90,7 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
                                 <thead>
                                     <tr className="text-gray-400">
                                         <th className="text-left px-6 py-1">Date</th>
-                                        <th className="text-left px-6 py-1">Weight (lbs)</th>
+                                        <th className="text-left px-6 py-1">Weight ({units})</th>
                                         <th className="text-left px-6 py-1">Reps</th>
                                     </tr>
                                 </thead>
@@ -86,7 +98,7 @@ export default function ExerciseRow({ supabase, user, exercise, setExercises }: 
                                     {logs.map((log: any) => (
                                         <tr key={log.logs.id}>
                                             <td className="px-6 py-2">{log.logs?.log_date}</td>
-                                            <td className="px-6 py-2">{log.weight}</td>
+                                            <td className="px-6 py-2">{convertFromBase(log.weight)}</td>
                                             <td className="px-6 py-2">{log.reps}</td>
                                         </tr>
                                     ))}

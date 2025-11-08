@@ -73,7 +73,6 @@ export default function LogPage() {
                     return;
                 }
                 if (data) {
-                    console.log(data.units, "hello")
                     setUnits(data.units);
                 }
             }

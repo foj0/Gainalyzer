@@ -43,9 +43,10 @@ type props = {
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
     supabase: SupabaseClient;
     user: User | null;
+    units: string | null;
 }
 
-export default function CreateTemplate({ exercises, templates, setTemplates, supabase, user }: props) {
+export default function CreateTemplate({ exercises, templates, setTemplates, supabase, user, units }: props) {
     const [open, setOpen] = useState(false); // if the dialog is open
     const [step, setStep] = useState<view>("createTemplate"); // to conditionally render either the createTemplate form or the selectExercises form
     const [templateName, setTemplateName] = useState("");
@@ -262,6 +263,7 @@ export default function CreateTemplate({ exercises, templates, setTemplates, sup
                                             exercise={e}
                                             selectedExercises={selectedExercises}
                                             setSelectedExercises={setSelectedExercises}
+                                            units={units}
                                         />
 
                                     ))}

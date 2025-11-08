@@ -24,11 +24,10 @@ type Log = {
     reps: number;
 }
 
-
-
 export default function ExerciseTable() {
     const supabase = createClient();
     const [user, setUser] = useState<User | null>(null);
+    const [units, setUnits] = useState<string | null>(null);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [logs, setLogs] = useState<Log[]>([]);
     const [exerciseSearch, setExerciseSearch] = useState<string>("")
@@ -41,8 +40,23 @@ export default function ExerciseTable() {
             console.error("Error fetching user: ", error);
             return;
         }
-        if (!user) return;
-        setUser(user);
+        if (user) {
+            setUser(user);
+            const { data, error: units_error } = await supabase
+                .from("profiles")
+                .select("units")
+                .eq("id", user.id)
+                .single();
+            if (units_error) {
+                console.log("Error fetching preferred units", units_error);
+                return;
+            }
+            if (data) {
+                console.log(data.units, "hello")
+                setUnits(data.units);
+            }
+        }
+
     }
 
     async function fetchExercises() {
@@ -131,6 +145,7 @@ export default function ExerciseTable() {
                                 user={user}
                                 exercise={e}
                                 setExercises={setExercises}
+                                units={units}
                             />
 
                         ))}

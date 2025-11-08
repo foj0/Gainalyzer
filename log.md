@@ -294,8 +294,13 @@ exercises in the template quickly.
 * User can set their preferred units (lbs or kg)
 * Log page can convert to lbs or kg depending on account settings. Database default is lbs.
 
+## 11-7:
+* Exercises, Templates, goals, dashboard pages now use the users preferred measurement units
+* Just need to make the chart use pref units
+
 
 ### todo:
+* Need to fix goal input value instantly converting when typing. Happens when pref set to kg not lbs
 * After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?
 * Fix goal section colors in light mode
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.

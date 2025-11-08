@@ -18,15 +18,25 @@ type ExerciseRowProps = {
     exercise: Exercise;
     selectedExercises: Exercise[];
     setSelectedExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+    units: string | null;
 }
 
-export default function ExerciseSelectRow({ supabase, user, exercise, selectedExercises, setSelectedExercises }: ExerciseRowProps) {
+export default function ExerciseSelectRow({ supabase, user, exercise, selectedExercises, setSelectedExercises, units }: ExerciseRowProps) {
     const [logs, setLogs] = useState<any>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     // const [enabled, setEnabled] = useState(false);
     const enabled = selectedExercises.some(ex => ex.id === exercise.id);
 
+    // Helper conversion functions to convert from lbs to kg
+    const convertFromBase = (lbs: number | null) => {
+        if (lbs === null || lbs === undefined) return "";
+        if (units === "kg") {
+            return (lbs * 0.45359237).toFixed(1); // to string
+        }
+        // if weight is already in lbs just return that, no need to convert
+        return lbs.toString();
+    }
 
     async function toggleDropdown() {
         if (!user) return;
@@ -43,7 +53,6 @@ export default function ExerciseSelectRow({ supabase, user, exercise, selectedEx
                 .eq("logs.user_id", user.id) // filter through join
                 .order("created_at", { ascending: false });
 
-            console.log(data);
             setLogs(data || []);
             setLoading(false);
 
@@ -105,7 +114,7 @@ export default function ExerciseSelectRow({ supabase, user, exercise, selectedEx
                                 <thead>
                                     <tr className="text-gray-400">
                                         <th className="text-left px-6 py-1">Date</th>
-                                        <th className="text-left px-6 py-1">Weight (lbs)</th>
+                                        <th className="text-left px-6 py-1">Weight ({units})</th>
                                         <th className="text-left px-6 py-1">Reps</th>
                                     </tr>
                                 </thead>
@@ -113,7 +122,7 @@ export default function ExerciseSelectRow({ supabase, user, exercise, selectedEx
                                     {logs.map((log: any) => (
                                         <tr key={log.logs.id}>
                                             <td className="px-6 py-2">{log.logs?.log_date}</td>
-                                            <td className="px-6 py-2">{log.weight}</td>
+                                            <td className="px-6 py-2">{convertFromBase(log.weight)}</td>
                                             <td className="px-6 py-2">{log.reps}</td>
                                         </tr>
                                     ))}
