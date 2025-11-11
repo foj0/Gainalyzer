@@ -101,27 +101,23 @@ export default function GoalsPage() {
 
             existingGoalsRef.current = goalMap
 
-
-            setBodyweightStart(goalMap.get("bodyweight")?.start_bodyweight ?? "");
-            setBodyweightGoal(goalMap.get("bodyweight")?.target_value ?? "");
+            setBodyweightStart(convertFromBase(Number(goalMap.get("bodyweight")?.start_bodyweight)) ?? "");
+            setBodyweightGoal(convertFromBase(Number(goalMap.get("bodyweight")?.target_value)) ?? "");
             setCalorieGoal(goalMap.get("calories")?.target_value ?? "");
             setSelectedExerciseId(goalMap.get("strength")?.exercise_id);
-            setWeightGoal(goalMap.get("strength")?.target_weight ?? "");
+            setWeightGoal(convertFromBase(goalMap.get("strength")?.target_weight) ?? "");
             setRepsGoal(goalMap.get("strength")?.target_reps ?? "");
-
-
-            console.log("existingGoals Map:", goalMap);
-            const bodyweightGoalObj = goalMap.get("bodyweight");
-            console.log("bodyweightGoalObj:", bodyweightGoalObj);
-            console.log("target_value:", bodyweightGoalObj?.target_value);
-            console.log("Number(target_value):", Number(bodyweightGoalObj?.target_value));
-
         }
     }
 
     useEffect(() => {
-        fetchGoals();
-    }, [user])
+        // need units to be fetched and set so that fetchGoals can convert the values if needed.
+        if (!units) {
+            return
+        } else {
+            fetchGoals();
+        }
+    }, [user, units])
 
     function checkForNewGoals() {
         let newGoals = [];
@@ -235,6 +231,8 @@ export default function GoalsPage() {
         toast.success("Goals saved.");
     }
 
+
+
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         const val = event.target.value;
         const inputId = event.target.id;
@@ -302,7 +300,7 @@ export default function GoalsPage() {
                             type="text"
                             placeholder="start"
                             className="w-24 text-right"
-                            value={convertFromBase(Number(bodyweightStart))}
+                            value={bodyweightStart}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                         />
@@ -317,7 +315,7 @@ export default function GoalsPage() {
                             type="text"
                             placeholder="target"
                             className="w-24 text-right"
-                            value={convertFromBase(Number(bodyweightGoal))}
+                            value={bodyweightGoal}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                         />
@@ -371,7 +369,7 @@ export default function GoalsPage() {
                             type="text"
                             placeholder="weight"
                             className="w-20 text-right"
-                            value={convertFromBase(Number(weightGoal))}
+                            value={weightGoal}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
                         />

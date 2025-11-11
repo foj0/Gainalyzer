@@ -343,7 +343,15 @@ export default function ExerciseBodyweightChart({ logs, userExercises, units }: 
                                                 style={{ backgroundColor: entry.color }} // dynamic color
                                             />
                                             {/* Label */}
-                                            <span className="text-gray-700">{entry.value}</span>
+                                            {/* entry.value === "strength" ? "Estimated One Rep Max" : (entry.value === "bodyweight" ? "Bodyweight : entry.value) */}
+                                            <span className="text-gray-700">{
+                                                entry.value === "strength"
+                                                    ? "Estimated One Rep Max"
+                                                    : entry.value === "bodyweight"
+                                                        ? "Bodyweight"
+                                                        : entry.value
+                                            }
+                                            </span>
                                         </div>
                                     ))}
                                 </div>

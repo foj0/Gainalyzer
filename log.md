@@ -298,6 +298,9 @@ exercises in the template quickly.
 * Exercises, Templates, goals, dashboard pages now use the users preferred measurement units
 * Just need to make the chart use pref units
 
+## 11-11:
+* Fixed goal input value bug not letting you type when units are set to kg.
+
 
 ### todo:
 * Need to fix goal input value instantly converting when typing. Happens when pref set to kg not lbs
