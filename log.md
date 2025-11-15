@@ -301,29 +301,19 @@ exercises in the template quickly.
 ## 11-11:
 * Fixed goal input value bug not letting you type when units are set to kg.
 
+## 11-12:
+Going through learn c sharp in y minutes
+
 
 ### todo:
-* Need to fix goal input value instantly converting when typing. Happens when pref set to kg not lbs
 * After renmaing an exercise is there a way to not reload the whole exercises list, but only update that one exercise name?
 * Fix goal section colors in light mode
 * Maybe have some top bar along the top of the screen. Not a navbar, but some bar, with maybe a pfp thing.
     would help fill up the screen a little more. So don't put the pfp thing at the bottom of the side panel like i was thinking.
-* Make an exercises page where you can select an exercise and it displays a table of all your logs for that specific exercise
-and a graph for it.
-    - each exercise is just an item in a list.
-    We have a kind of table and each exercise is a row with borders on every side.
-    Have a search bar on top to filter exercises by name
-    On the far right of the row, have a dropdown arrow and a delete button and an edit name button with pencil icon
-        - delete just deletes
-        - edit can change the exercise name
-        - drop down arrow displays another table with all your logs for that exercise
-        - Idk if i should store this data again or if theres some way to reference the logs table
 * Have a fixed aspect ratio for the exercise bw chart so it doesn't get elongated height wise. Should always be wider.
 * idk. Move the isMObile check from the exercisebodyweight chart to the dashboard page and do pass it down as props to everything else.
-* Redo the exercise and date range selects to be better looking and limit how many options show at once on exercise select.
 * Fix the x axis ticks. They're not changing for some reason.
 * Fix the "All" on the first bodyweight chart
-* Should make a thing to create a workout template and add all those exercises in one go.
 * Make the pick date calendar start at the current log date, not today's actual date.
 * Make it so that you can't save a log without filling in the weight/reps in an exercise card
 * Create an exercise selector dropdown that pulls from the users exercises, default to the most recently added

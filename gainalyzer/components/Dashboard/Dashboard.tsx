@@ -95,6 +95,11 @@ export default function Dashboard() {
     const [strengthPR, setStrengthPR] = useState<StrengthPR | null>(null);
     const goalsRef = useRef(new Map());
 
+    // selections for the chart and ai-analysis
+    const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "180d" | "365d" | "all">("all");
+    const [selectedExercise, setSelectedExercise] = useState<string>("");
+
+
     // Helper conversion functions to convert from lbs to kg
     const convertFromBase = (lbs: number | null) => {
         if (lbs === null || lbs === undefined) return "";
@@ -670,9 +675,9 @@ export default function Dashboard() {
                         <h2 className="text-lg font-semibold mb-1">Progress and Analysis</h2>
                         <div className="flex flex-col lg:flex-row justify-center gap-6">
                             {/* <BodyweightChart logs={logs} /> */}
-                            <ExerciseBodyweightChart logs={logs} userExercises={userExercises} units={units} />
+                            <ExerciseBodyweightChart logs={logs} userExercises={userExercises} units={units} dateRange={dateRange} setDateRange={setDateRange} selectedExercise={selectedExercise} setSelectedExercise={setSelectedExercise} />
 
-                            <AiAnalysisSection selectedExercise={"Bench Press"} />
+                            <AiAnalysisSection logs={logs} selectedExercise={selectedExercise} dateRange={dateRange} units={units} />
 
                         </div>
                     </div>

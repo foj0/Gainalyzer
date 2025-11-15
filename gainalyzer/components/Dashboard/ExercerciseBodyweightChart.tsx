@@ -36,9 +36,17 @@ interface ChartData {
     yTickCount: number;
 }
 
-export default function ExerciseBodyweightChart({ logs, userExercises, units }: { logs: Log[], userExercises: { id: string, name: string }[] | null, units: string }) {
-    const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "180d" | "365d" | "all">("all");
-    const [selectedExercise, setSelectedExercise] = useState<string>("");
+type Props = {
+    logs: Log[];
+    userExercises: { id: string, name: string }[] | null;
+    units: string;
+    dateRange: "7d" | "30d" | "90d" | "180d" | "365d" | "all";
+    setDateRange: React.Dispatch<React.SetStateAction<"7d" | "30d" | "90d" | "180d" | "365d" | "all">>;
+    selectedExercise: string;
+    setSelectedExercise: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export default function ExerciseBodyweightChart({ logs, userExercises, units, dateRange, setDateRange, selectedExercise, setSelectedExercise }: Props) {
     const [isMobile, setIsMobile] = useState(false);
 
     // set selectedExercise as the most recently logged exercise
@@ -346,7 +354,7 @@ export default function ExerciseBodyweightChart({ logs, userExercises, units }: 
                                             {/* entry.value === "strength" ? "Estimated One Rep Max" : (entry.value === "bodyweight" ? "Bodyweight : entry.value) */}
                                             <span className="text-gray-700">{
                                                 entry.value === "strength"
-                                                    ? "Estimated One Rep Max"
+                                                    ? "Estimated One Rep max"
                                                     : entry.value === "bodyweight"
                                                         ? "Bodyweight"
                                                         : entry.value
