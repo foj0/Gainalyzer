@@ -15,7 +15,6 @@ import { useState, useEffect } from "react";
 import { ExerciseCombobox } from "@/components/ExerciseCombobox/ExerciseCombobox";
 import { NewExercise } from "./NewExercise";
 import { createClient } from "@/utils/supabase/client"
-import AddTemplate from "./AddTemplate";
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import ExerciseSelectRow from "../ExercisePopupSelector/ExerciseSelectRow";
 import { BsChevronDown } from "react-icons/bs";

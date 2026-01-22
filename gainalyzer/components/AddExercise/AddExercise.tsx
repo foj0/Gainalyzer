@@ -11,7 +11,6 @@ import { useState, useEffect } from "react";
 import { ExerciseCombobox } from "@/components/ExerciseCombobox/ExerciseCombobox";
 import { NewExercise } from "./NewExercise";
 import { createClient } from "@/utils/supabase/client"
-import AddTemplate from "./AddTemplate";
 
 const supabase = createClient();
 
