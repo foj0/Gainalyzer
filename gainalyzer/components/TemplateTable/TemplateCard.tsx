@@ -58,13 +58,15 @@ type Props = {
     template: Template;
     templateExercises: TemplateExercise[];
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
+    units: string | null;
 };
 
 export default function TemplateCard({
     supabase,
     user,
     template,
-    setTemplates
+    setTemplates,
+    units
 }: Props) {
 
     // Only show first 5 exercises
@@ -164,6 +166,7 @@ export default function TemplateCard({
                 setTemplates={setTemplates}
                 open={editOpen}
                 setOpen={setEditOpen}
+                units={units}
             />
             <DeleteTemplateAlert
                 supabase={supabase}

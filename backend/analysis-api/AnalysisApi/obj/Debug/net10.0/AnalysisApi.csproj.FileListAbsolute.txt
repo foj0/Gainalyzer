@@ -8,6 +8,9 @@
 /home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/bin/Debug/net10.0/AnalysisApi.pdb
 /home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/bin/Debug/net10.0/Microsoft.AspNetCore.OpenApi.dll
 /home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/bin/Debug/net10.0/Microsoft.OpenApi.dll
+/home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/bin/Debug/net10.0/OpenAI.dll
+/home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/bin/Debug/net10.0/System.ClientModel.dll
+/home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/bin/Debug/net10.0/System.Memory.Data.dll
 /home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/obj/Debug/net10.0/AnalysisApi.csproj.AssemblyReference.cache
 /home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/obj/Debug/net10.0/rpswa.dswa.cache.json
 /home/jon/code/Gainalyzer/backend/analysis-api/AnalysisApi/obj/Debug/net10.0/AnalysisApi.GeneratedMSBuildEditorConfig.editorconfig

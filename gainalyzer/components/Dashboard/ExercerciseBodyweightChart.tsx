@@ -48,6 +48,7 @@ type Props = {
 
 export default function ExerciseBodyweightChart({ logs, userExercises, units, dateRange, setDateRange, selectedExercise, setSelectedExercise }: Props) {
     const [isMobile, setIsMobile] = useState(false);
+    console.log("Logs: ", logs);
 
     // set selectedExercise as the most recently logged exercise
     useEffect(() => {

@@ -22,6 +22,7 @@ import {
     DialogTrigger,
     DialogFooter,
 } from "@/components/ui/dialog"
+import { toast } from "sonner"
 
 function DisplayField({
     label,
@@ -165,7 +166,7 @@ export default function ProfileForm({ user }: { user: User | null }) {
 
         } catch (error) {
             console.error("Error loading user account.", error);
-            alert('Error loading user data!');
+            toast.error("Error loading user data!");
         } finally {
             setLoading(false);
         }
@@ -198,9 +199,9 @@ export default function ProfileForm({ user }: { user: User | null }) {
                 updated_at: new Date().toISOString(),
             })
             if (error) throw error
-            alert('Profile updated!')
+            toast.success("Profile updated!");
         } catch (error) {
-            alert('Error updating the data!')
+            toast.error("Error updating profile.");
         } finally {
             setLoading(false)
         }

@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type') as EmailOtpType | null
 
     // if next query param exists redirect there, otherwise default to /account
-    const next = searchParams.get('next') ?? '/account'
+    const next = searchParams.get('next') ?? '/profile'
     // Create redirect link without the secret token
     const redirectTo = request.nextUrl.clone()
     redirectTo.pathname = next

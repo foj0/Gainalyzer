@@ -25,7 +25,6 @@ export default function Sidebar() {
         { href: "/exercises", label: "Exercises" },
         { href: "/templates", label: "Templates" },
         { href: "/profile", label: "Profile" },
-        { href: "/about", label: "About" },
     ]
 
     // TODO: ADD BREAK LINE IMG THING BEFORE SIGN OUT
@@ -106,15 +105,6 @@ export default function Sidebar() {
 
                     {isSettingsOpen && (
                         <div className="settings-popup absolute bottom-full mb-2 p-2 left-0 w-[250px] rounded-md shadow-lg">
-                            <div className="settings-item block w-full px-4 py-2 text-left cursor-pointer rounded-md">
-                                <Link
-                                    href="/settings"
-                                    className="flex items-center gap-4 pl-1"
-                                >
-                                    <Settings size={25} />
-                                    Settings
-                                </Link>
-                            </div>
                             <div className="settings-item block w-full px-4 py-2 text-left cursor-pointer rounded-md"
                                 onClick={() => theme === "light" ? setTheme("dark") : setTheme("light")}>
                                 <ThemeToggle />

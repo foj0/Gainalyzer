@@ -683,6 +683,14 @@ thead th {
     padding: 8px;
 }
 
+.progress-bar {
+    background-color: var(--progress-bar-bg);
+}
+
+.progress-bar-fill {
+    background-color: var(--progress-bar-fill);
+}
+
 /* Light & Dark mode defaults */
 :root {
     --radius: 0.625rem;
@@ -724,6 +732,10 @@ thead th {
     --dashboard-section-primary: oklch(0.985 0 0);
     --dashboard-section-secondary: oklch(0.97 0 0);
     --select-border: oklch(0.922 0 0);
+    --progress-bar-fill: oklch(62.3% 0.214 259.815);
+    --progress-bar-bg: oklch(87.2% 0.01 258.338);
+    --progress-path: oklch(62.3% 0.214 259.815);
+    --progress-trail: oklch(87.2% 0.01 258.338);
 }
 
 .dark {
@@ -779,4 +791,8 @@ thead th {
     --dashboard-section-primary: oklch(0.205 0 0);
     --dashboard-section-secondary: oklch(0.269 0 0);
     --select-border: oklch(0.3211 0 0);
+    --progress-bar-fill: oklch(62.3% 0.214 259.815);
+    --progress-bar-bg: oklch(27.8% 0.033 256.848);
+    --progress-path: oklch(62.3% 0.214 259.815);
+    --progress-trail: oklch(27.8% 0.033 256.848);
 }

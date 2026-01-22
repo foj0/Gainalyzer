@@ -144,7 +144,6 @@ export default function Dashboard() {
         async function fetchLogs() {
             if (!user) return;
 
-            // console.log("fetching logs")
             const response = await supabase
                 .from("logs")
                 .select(`
@@ -247,6 +246,14 @@ export default function Dashboard() {
         return `${month} ${day}, ${year}`;
     }
 
+    function toLocalDateString(date: Date) {
+        const offset = date.getTimezoneOffset();
+        const local = new Date(date.getTime() - offset * 60 * 1000);
+        return local.toISOString().split("T")[0];
+    }
+
+
+
     // pull info from the most recent log and update quick stats section
     useEffect(() => {
         let mostRecentLog: Log | undefined;
@@ -275,10 +282,10 @@ export default function Dashboard() {
 
             // protein and todaysCalories are daily metrics.
             // So if the most recent log isn't for today, set those to 0.
-            const today = new Date();
-            if (today === date) {
-                protein = mostRecentLog.protein;
-                todaysCalories = mostRecentLog.calories;
+            const todayStr = toLocalDateString(new Date());
+            if (todayStr === mostRecentLog.log_date) {
+                protein = mostRecentLog.protein ?? 0;
+                todaysCalories = mostRecentLog.calories ?? 0;
             } else {
                 protein = 0;
                 todaysCalories = 0;
@@ -295,8 +302,6 @@ export default function Dashboard() {
                 date: formattedDate ?? null,
             }
         )
-        console.log("quickstats current bw: ", quickStats?.currentBodyweight)
-        console.log("raw cbw", currentBodyweight)
 
     }, [logs])
 
@@ -321,8 +326,8 @@ export default function Dashboard() {
         const goalExerciseName = userExercises?.find(ex => ex.id === goalsRef.current.get("strength")?.exercise_id)?.name;
         let maxORM = null;
         let bestSet = { weight: 0, reps: 0 };
-        for (let log of logs) {
-            for (let ex of log.exercises) {
+        for (const log of logs) {
+            for (const ex of log.exercises) {
                 let estORM
                 if (ex.name === goalExerciseName && ex.weight && ex.reps) {
                     estORM = ex.weight / (1.0278 - 0.0278 * ex.reps);
@@ -361,8 +366,6 @@ export default function Dashboard() {
                 });
 
                 goalsRef.current = goalMap
-                console.log("goalmap", goalMap);
-
 
                 const bwStart = goalMap.get("bodyweight")?.start_bodyweight ?? "";
                 const bwGoal = goalMap.get("bodyweight")?.target_value ?? "";
@@ -375,7 +378,6 @@ export default function Dashboard() {
 
                 if (bwStart != "" && bwGoal != "") {
                     const bodyweightProgress = Number(bwStart) - Number(quickStats?.currentBodyweight);
-                    console.log("currentBW: ", quickStats?.currentBodyweight);
                     let bodyweightProgressDesc = ""
                     if (bodyweightProgress <= 0) {
                         bodyweightProgressDesc = `+${Math.abs(bodyweightProgress).toFixed(1)} ${units} from starting weight`
@@ -393,12 +395,10 @@ export default function Dashboard() {
 
 
     function ProgressBar({ value, label }: ProgressBarProps) {
-        console.log("value: ", value)
         const val = value * 100;
-        console.log("val: ", val)
         return (
-            <div className="w-full bg-gray-800 rounded-full h-4 relative">
-                <div className={`bg-blue-500 rounded-full h-4`}
+            <div className="w-full rounded-full h-4 relative progress-bar">
+                <div className={`rounded-full h-4 progress-bar-fill`}
                     style={{ width: `${val}%` }}
                 >
                 </div>
@@ -406,6 +406,27 @@ export default function Dashboard() {
 
             </div >
         );
+    }
+
+    function CalorieProgressBar() {
+        return (
+            <div className="flex w-30 items-center mb-4">
+                <CircularProgressbarWithChildren minValue={0} maxValue={Number(goalsRef.current.get("calories")?.target_value ?? 0)} value={Number(quickStats?.todaysCalories ?? 0)}
+                    styles={buildStyles({
+                        pathColor: 'var(--progress-path)',   // filled (progress) part — Tailwind blue-500
+                        trailColor: 'var(--progress-trail)',  // unfilled / empty ring — your desired gray
+                        textColor: '#e5e7eb',
+                    })}
+                >
+                    <div style={{ fontSize: 12, marginTop: -5 }}>
+                        <div className="flex flex-col text-center">
+                            <strong className="text-lg">{((goalsRef.current.get("calories")?.target_value - ((quickStats?.todaysCalories) ?? 0)))}</strong>
+                            <p className="">remaining</p>
+                        </div>
+                    </div>
+                </CircularProgressbarWithChildren>
+            </div>
+        )
     }
 
 
@@ -418,7 +439,7 @@ export default function Dashboard() {
             <div className="flex flex-col gap-4">
                 {/* Quickstats Section */}
                 <div className="dashboard-section">
-                    <h2 className="text-lg font-semibold mb-1">Today's Stats</h2>
+                    <h2 className="text-lg font-semibold mb-1">Today&apos;s Stats</h2>
                     {/* Mobile: 2x2 grid; Desktop: flex row */}
                     <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-row sm:gap-6 flex-1">
 
@@ -477,7 +498,7 @@ export default function Dashboard() {
                         <div className="dashboard-section-1 flex items-center gap-3 p-4 flex-1">
                             <Drumstick className="text-purple-500 w-6 h-6" />
                             <div>
-                                <h3 className="text-sm font-semibold">Today's Protein</h3>
+                                <h3 className="text-sm font-semibold">Today&apos;s Protein</h3>
                                 <p className="text-lg font-medium">
                                     {quickStats?.protein ?? "N/A"}
                                     <span> {quickStats?.protein != null ? "g" : ""} </span>
@@ -529,7 +550,7 @@ export default function Dashboard() {
                                 </>
                                 :
                                 <div className="flex flex-1 items-center">
-                                    <p className="text-center text-gray-400">You haven't set your bodyweight goal yet</p>
+                                    <p className="text-center text-gray-400">You haven&apos;t set your bodyweight goal yet</p>
                                 </div>
                             }
                         </div>
@@ -544,22 +565,7 @@ export default function Dashboard() {
                                 <>
                                     <h3 className="text-lg font-semibold mb-3">Daily Calorie Goal</h3>
                                     <div className="flex flex-1 justify-center items-center gap-8 sm:gap-8">
-                                        <div className="flex w-30 items-center mb-4">
-                                            <CircularProgressbarWithChildren minValue={0} maxValue={goalsRef.current.get("calories")?.target_value ?? 0} value={quickStats?.todaysCalories ?? 0}
-                                                styles={buildStyles({
-                                                    pathColor: '#3b82f6',   // filled (progress) part — Tailwind blue-500
-                                                    trailColor: '#1e2939',  // unfilled / empty ring — your desired gray
-                                                    textColor: '#e5e7eb',
-                                                })}
-                                            >
-                                                <div style={{ fontSize: 12, marginTop: -5 }}>
-                                                    <div className="flex flex-col text-center">
-                                                        <strong className="text-lg">{((goalsRef.current.get("calories")?.target_value - ((quickStats?.todaysCalories) ?? 0)))}</strong>
-                                                        <p className="">remaining</p>
-                                                    </div>
-                                                </div>
-                                            </CircularProgressbarWithChildren>
-                                        </div>
+                                        <CalorieProgressBar />
                                         <div className="flex flex-col justify-around gap-3">
                                             <div className="flex gap-3">
                                                 <Flag className="w-6 h-6 text-orange-400" />
@@ -582,7 +588,7 @@ export default function Dashboard() {
                                 :
 
                                 <div className="flex flex-1 items-center">
-                                    <p className="text-center text-gray-400">You haven't set your daily calorie goal yet</p>
+                                    <p className="text-center text-gray-400">You haven&apos;t set your daily calorie goal yet</p>
                                 </div>
                             }
                         </div>
@@ -597,59 +603,76 @@ export default function Dashboard() {
                                             Strength Goal
                                         </h3>
 
-                                        <div className="flex flex-col gap-2 text-gray-200">
+                                        <div className="flex flex-col gap-2 text-sm">
                                             {/* Exercise Info */}
                                             <div className="flex justify-between items-center">
                                                 <p className="font-medium text-base">
                                                     {userExercises?.find(ex => ex.id === goalsRef.current.get("strength")?.exercise_id)?.name}
                                                 </p>
-                                                <p className="text-sm text-gray-400 italic">
+                                                <p className="text-xs italic">
                                                     Goal Set
                                                 </p>
                                             </div>
 
                                             {/* Target */}
-                                            <div className="flex justify-between text-sm">
-                                                <p className="text-gray-400">
-                                                    Target:
+                                            <div className="flex justify-between">
+                                                <p className="text-sm">
+                                                    Target
                                                 </p>
-                                                <p className="font-semibold text-gray-100">
+                                                <p className="font-semibold">
                                                     {convertFromBase(Number(goalsRef.current.get("strength")?.target_weight))} {units} × {goalsRef.current.get("strength")?.target_reps} reps
                                                 </p>
                                             </div>
 
                                             {/* Goal 1RM */}
-                                            <div className="flex justify-between text-sm border-b border-zinc-800 pb-2 mb-2">
-                                                <p className="text-gray-400">Estimated 1RM</p>
+                                            <div className="flex justify-between border-b border-zinc-800 pb-2 mb-2">
+                                                <p className="text-sm">
+                                                    Estimated 1RM
+                                                </p>
                                                 <p className="font-semibold">
-                                                    {(Number(convertFromBase(Number(goalsRef.current.get("strength")?.target_weight) / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps))).toFixed(0))} {units}
+                                                    {(Number(
+                                                        convertFromBase(
+                                                            Number(goalsRef.current.get("strength")?.target_weight) /
+                                                            (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps)
+                                                        )
+                                                    ).toFixed(0))} {units}
                                                 </p>
                                             </div>
 
                                             {/* PR Section */}
                                             <div className="flex flex-col gap-1">
-                                                <p className="text-sm text-gray-400">{strengthPR != null ? "Your Best Set" : null}</p>
+                                                {strengthPR != null && (
+                                                    <p className="text-xs uppercase tracking-wide">
+                                                        Your Best Set
+                                                    </p>
+                                                )}
 
                                                 {strengthPR != null ? (
-                                                    <div className="flex justify-between items-center bg-zinc-800/50 px-3 py-2 rounded-lg border border-zinc-700">
-                                                        <div>
-                                                            <p className="text-sm text-gray-200">
+                                                    <div className="flex justify-between items-center px-3 py-2 rounded-lg border border-zinc-700">
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <p className="text-sm font-medium">
                                                                 {convertFromBase(Number(strengthPR.set.weight))} {units} × {strengthPR.set.reps} reps
                                                             </p>
-                                                            <p className="text-xs text-gray-400">
-                                                                Est. 1RM: <span className="text-gray-100 font-medium">{(Number(convertFromBase(Number(strengthPR.ORM)) ?? 0).toFixed(0))} {units}</span>
+                                                            <p className="text-xs">
+                                                                Est. 1RM: <span className="font-semibold">
+                                                                    {(Number(convertFromBase(Number(strengthPR.ORM)) ?? 0).toFixed(0))} {units}
+                                                                </span>
                                                             </p>
                                                         </div>
 
-                                                        {/* Small progress ring style indicator */}
-                                                        <div className="font-bold text-sm">
-                                                            {Math.min(100, ((strengthPR.ORM ?? 0) /
-                                                                (goalsRef.current.get("strength")?.target_weight / (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps)) * 100)
+                                                        {/* Progress indicator */}
+                                                        <div className="font-bold text-sm tabular-nums">
+                                                            {Math.min(
+                                                                100,
+                                                                ((strengthPR.ORM ?? 0) /
+                                                                    (goalsRef.current.get("strength")?.target_weight /
+                                                                        (1.0278 - 0.0278 * goalsRef.current.get("strength")?.target_reps))
+                                                                ) * 100
                                                             ).toFixed(0)}%
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <p className="text-sm text-gray-400 italic text-center py-2">
+                                                    <p className="text-sm italic text-center py-2">
                                                         No PR set yet
                                                     </p>
                                                 )}
@@ -658,13 +681,12 @@ export default function Dashboard() {
                                     </>
                                 )
                                 : (
-                                    <div className="flex flex-1 items-center justify-center text-gray-500 italic">
+                                    <div className="flex flex-1 items-center justify-center italic text-sm">
                                         You haven’t set your strength goal yet
                                     </div>
                                 )
                             }
                         </div>
-
                     </div>
 
                 </div>
@@ -674,11 +696,8 @@ export default function Dashboard() {
                     <div className="dashboard-section">
                         <h2 className="text-lg font-semibold mb-1">Progress and Analysis</h2>
                         <div className="flex flex-col lg:flex-row justify-center gap-6">
-                            {/* <BodyweightChart logs={logs} /> */}
                             <ExerciseBodyweightChart logs={logs} userExercises={userExercises} units={units} dateRange={dateRange} setDateRange={setDateRange} selectedExercise={selectedExercise} setSelectedExercise={setSelectedExercise} />
-
                             <AiAnalysisSection logs={logs} selectedExercise={selectedExercise} dateRange={dateRange} units={units} />
-
                         </div>
                     </div>
                 </div>

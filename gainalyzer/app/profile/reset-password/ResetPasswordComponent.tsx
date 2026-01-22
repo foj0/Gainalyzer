@@ -96,7 +96,7 @@ export default function ResetPasswordComponent() {
             const { data: { session } } = await supabase.auth.getSession()
             if (session) {
                 // redirect to account page as a logged in user
-                window.location.href = '/account'
+                window.location.href = '/profile'
             }
 
         } catch (err) {

@@ -75,11 +75,13 @@ async function loginWithEmailPassword(formData: FormData) {
 
     revalidatePath('/', 'layout')
 
-    if (profile?.is_complete) {
-        return { redirect: '/' }
-    } else {
-        return { redirect: '/account' }
-    }
+    return { redirect: '/' }
+
+    // if (profile?.is_complete) {
+    //     return { redirect: '/' }
+    // } else {
+    //     return { redirect: '/profile' }
+    // }
 }
 
 async function signupWithEmailPassword(formData: FormData) {
@@ -128,8 +130,7 @@ async function signupWithEmailPassword(formData: FormData) {
     }
 
     revalidatePath('/', 'layout')
-    return { redirect: '/account' }
-    // redirect('/account') // Redirect back to home page
+    return { redirect: '/profile' }
 }
 
 export { signInWithGoogle, loginWithEmailPassword, signupWithEmailPassword }

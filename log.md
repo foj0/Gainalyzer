@@ -302,7 +302,32 @@ exercises in the template quickly.
 * Fixed goal input value bug not letting you type when units are set to kg.
 
 ## 11-12:
-Going through learn c sharp in y minutes
+* Going through learn c sharp in y minutes
+
+## 11-14:
+* got a basic .net backup up and responding to requests.
+* Fixed bug with the analysis scrolling text skipping letters and showing undefined at the end.
+
+
+Spent like 2 weeks just learning c# and .net
+
+## 11-30:
+* Got an api chat endpoint to actually work. But it response super long and unfocused.
+* Need to mess around with different models to see which is best
+* Need to improve prompt to be more specific and answer how I want
+* For some reason the exercise data isn't showing in the backend correctly.
+probably just need to fix the analyzerequest type fields.
+
+## 12-1:
+* Found a different model, an instruction model as opposed to a thinking one
+that correctly only responds with what I want.
+* Starting landing / home page
+
+## 12-2:
+* Landing page looking better. 
+
+## 12-4:
+* More work on landing page. Got phone mockup image.
 
 
 ### todo:
@@ -332,3 +357,4 @@ do it once and keep that for the rest of the session?
 * Maybe add a little chart thingy that highlights days you've logged this week to dashboard.
 So we can have like 7 circles, sun - sat, and days that you did log are filled in green or lit up,
 otherwise they are grayed out.
+* Should add graphs under each exercise in the exercises page

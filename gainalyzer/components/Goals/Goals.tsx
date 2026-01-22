@@ -120,7 +120,7 @@ export default function GoalsPage() {
     }, [user, units])
 
     function checkForNewGoals() {
-        let newGoals = [];
+        const newGoals = [];
 
         const existingBody = existingGoalsRef.current.get("bodyweight");
         const existingCals = existingGoalsRef.current.get("calories");

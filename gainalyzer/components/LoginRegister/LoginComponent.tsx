@@ -157,7 +157,7 @@ const LoginComponent = () => {
                         </>
 
                         <div className='flex flex-row justify-center mt-3'>
-                            <Link href="/account/reset-password/request-email" className="hover:underline">
+                            <Link href="/profile/reset-password/request-email" className="hover:underline">
                                 Forgot password?
                             </Link>
                         </div>

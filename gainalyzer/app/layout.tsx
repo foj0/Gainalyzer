@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: "Gainalyzer",
-    description: " by create next app",
+    description: "Track your workouts and analyze your gains.",
 };
 
 export default function RootLayout({

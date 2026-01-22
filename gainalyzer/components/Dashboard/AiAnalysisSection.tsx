@@ -43,6 +43,7 @@ export function AiAnalysisSection({ selectedExercise, logs, dateRange, units }: 
         // timeout to simulate analysis taking time
         setTimeout(async () => {
             const aiLogs = prepareAiLogs(logs, selectedExercise, dateRange, units);
+            console.log("pre", aiLogs);
 
             const response = await fetch("http://localhost:5151/analyze", {
                 method: "POST",
@@ -55,6 +56,7 @@ export function AiAnalysisSection({ selectedExercise, logs, dateRange, units }: 
                 })
             });
 
+            console.log("Response: ", response);
             const data = await response.json();
             setAnalysisText(data.message);
             setAnalyzing(false);
@@ -125,8 +127,8 @@ export function AiAnalysisSection({ selectedExercise, logs, dateRange, units }: 
                         className="mt-4 text-sm text-left max-w-sm leading-relaxed"
                     >
                         <div className="inline-flex">
-                            <span>{displayedText}</span>
-                            <span className="animate-pulse">▋</span>
+                            <span>{displayedText} <span className="animate-pulse">▋</span>
+                            </span>
                         </div>
                     </motion.div>
                 )}

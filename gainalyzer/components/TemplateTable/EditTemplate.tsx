@@ -44,13 +44,13 @@ type props = {
     setTemplateExercises: React.Dispatch<React.SetStateAction<TemplateExercise[]>>;
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
     supabase: SupabaseClient;
-    user: User | null;
+    user: User;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    units: string | null;
 }
 
-const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, open, setOpen }: props) => {
-    if (!user) return;
+const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, open, setOpen, units }: props) => {
     const [step, setStep] = useState<view>("editTemplate"); // to conditionally render either the editTemplate form or the selectExercises form
     const [exercises, setExercises] = useState([]);
     const [templateName, setTemplateName] = useState(template.name);
@@ -176,6 +176,8 @@ const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTe
         handleClose();
     }
 
+    if (!user) return null;
+
     return (
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -299,6 +301,7 @@ const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTe
                                             exercise={e}
                                             selectedExercises={selectedExercises}
                                             setSelectedExercises={setSelectedExercises}
+                                            units={units}
                                         />
 
                                     ))}
