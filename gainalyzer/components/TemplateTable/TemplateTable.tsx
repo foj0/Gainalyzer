@@ -39,6 +39,23 @@ type Template = {
     template_exercises: TemplateExercise[];
 }
 
+// The following two types represent the returned shape from supabase
+// The previous types are used for UI
+type TemplateExerciseRow = {
+    id: string;
+    template_id: string;
+    exercise_id: string;
+    exercise: {
+        name: string;
+    } | null;
+}
+
+type TemplateRow = {
+    id: string;
+    name: string;
+    template_exercises: TemplateExerciseRow[];
+}
+
 export default function TemplateTable() {
     const supabase = createClient();
     const [user, setUser] = useState<User | null>(null);
@@ -99,20 +116,21 @@ export default function TemplateTable() {
         if (!user) return;
 
         setLoading(true);
-        const { data: templates, error } = await supabase
-            .from("workout_templates")
+        const { data, error } = await supabase
+            .from<any, any>("workout_templates")
             .select(`
+            id,
+            name,
+            template_exercises (
                 id,
-                name,
-                template_exercises (
-                    id,
-                    template_id,
-                    exercise_id,
-                    exercise:exercises (name)
-                )
-              `)
+                template_id,
+                exercise_id,
+                exercise:exercises (name)
+            )
+        `)
             .eq("user_id", user.id)
             .order("name", { ascending: true });
+
         if (error) {
             console.error("Error fetching templates: ", error);
             return;
@@ -121,18 +139,22 @@ export default function TemplateTable() {
             setLoading(false);
             return;
         }
+        if (!data) return;
 
-        const formatted = templates.map((t: any) => ({
+        console.log("template data returned from supabase: ", data);
+
+        const formatted: Template[] = (data as TemplateRow[]).map((t) => ({
             id: t.id,
             name: t.name,
-            template_exercises: t.template_exercises.map((te: any) => ({
+            template_exercises: t.template_exercises.map((te) => ({
                 id: te.id,
                 template_id: te.template_id,
                 exercise_id: te.exercise_id,
-                name: te.exercise.name
-            }))
+                name: te.exercise?.name ?? "Unknown Exercise"
+            })),
         }));
-        console.log(formatted);
+
+        console.log("Formatted template data:", formatted);
         setTemplates(formatted);
         setLoading(false);
     }
@@ -182,6 +204,7 @@ export default function TemplateTable() {
                                             template={t}
                                             templateExercises={t.template_exercises}
                                             setTemplates={setTemplates}
+                                            units={units}
                                         />
                                     ))}
                                 </div>
