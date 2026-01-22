@@ -441,7 +441,7 @@ export default function LogPage() {
                         {/* Add Exercise Button */}
                         <div className={`absolute left-0 right-0 bottom-0 mb-2 ${exercises.length > 0 ? "mt-8" : ""}`}>
                             {/* <AddExercise onAdd={handleAddExercise} /> */}
-                            <NewAddExercise logExercises={exercises} setLogExercises={setExercises} supabase={supabase} user={user} onAdd={handleAddExercises} />
+                            <NewAddExercise logExercises={exercises} setLogExercises={setExercises} supabase={supabase} user={user} onAdd={handleAddExercises} units={units} />
                         </div>
                     </div>
 

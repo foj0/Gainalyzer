@@ -55,6 +55,7 @@ type Props = {
     supabase: SupabaseClient;
     user: User;
     onAdd: (exercises: Exercise[]) => void;
+    units: string;
 }
 
 type TemplateItemProps = {
@@ -87,7 +88,7 @@ const TemplateItem = ({ template, onAddTemplate }: TemplateItemProps) => {
     );
 }
 
-export const NewAddExercise = ({ logExercises, setLogExercises, supabase, user, onAdd }: Props) => {
+export const NewAddExercise = ({ logExercises, setLogExercises, supabase, user, onAdd, units }: Props) => {
     const [open, setOpen] = useState<boolean>(false);
     const [tab, setTab] = useState<Tab>("exercise");
     const [refreshKey, setRefreshKey] = useState(0); // updated when we add an exercise in NewExercise to trigger a refetch
@@ -306,6 +307,7 @@ export const NewAddExercise = ({ logExercises, setLogExercises, supabase, user, 
                                                 exercise={e}
                                                 selectedExercises={selectedExercises}
                                                 setSelectedExercises={setSelectedExercises}
+                                                units={units}
                                             />
 
                                         ))}
