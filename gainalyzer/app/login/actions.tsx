@@ -12,7 +12,13 @@ const signInWith = (provider: Provider) => async () => {
 
     const supabase = await createClient()
 
-    const auth_callback_url = `${process.env.SITE_URL}/auth/callback`
+    const siteUrl = process.env.SITE_URL;
+
+    if (!siteUrl) {
+        throw new Error("SITE_URL is not defined");
+    }
+
+    const auth_callback_url = `${siteUrl}/auth/callback`
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -21,7 +27,7 @@ const signInWith = (provider: Provider) => async () => {
         },
     })
 
-    console.log(data)
+    // console.log(data)
 
     if (error) {
         console.log(error)
