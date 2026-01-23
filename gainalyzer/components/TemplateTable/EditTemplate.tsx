@@ -52,7 +52,7 @@ type props = {
 
 const EditTemplate = ({ templateExercises, setTemplateExercises, template, setTemplates, supabase, user, open, setOpen, units }: props) => {
     const [step, setStep] = useState<view>("editTemplate"); // to conditionally render either the editTemplate form or the selectExercises form
-    const [exercises, setExercises] = useState([]);
+    const [exercises, setExercises] = useState<Exercise[]>([]);
     const [templateName, setTemplateName] = useState(template.name);
 
     // NOTE: We first edit/add/delete exercises from the template as type Exercise.
