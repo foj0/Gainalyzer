@@ -1,3 +1,4 @@
+//what
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from 'next/navigation'
 import Link from "next/link";
@@ -17,38 +18,19 @@ export default async function Dashboard() {
     const session = await supabase.auth.getUser()
 
     // if not signed in redirect to login page
-    if (!session.data.user) {
-        redirect('/login')
-    }
+    // if (!session.data.user) {
+    //     redirect('/login')
+    // }
 
     // destructure some data from session
-    const {
-        data: {
-            user: { user_metadata, app_metadata },
-        },
-    } = session
-
-    const { name, email, user_name, avatar_url } = user_metadata
-
-    console.log(session);
-    // if logged in show home page info
-    // return (
-    //     <div className="flex flex-row">
-    //         {/* Sidebar navigation on the left */}
-    //         <div className="absolute top-4 right-4 z-50">
-    //             <ThemeToggle />
-    //         </div>
-    //         <Sidebar />
+    // const {
+    //     data: {
+    //         user: { user_metadata, app_metadata },
+    //     },
+    // } = session
     //
-    //         {/* Main content area */}
-    //         <main className="flex-1 justify-center text-center md:ml-[200px] xl:ml-[300px] mt-16 md:mt-0 p-6">
-    //             Home page
-    //         </main >
-    //
-    //
-    //     </div >
-    // );
-    //bg-[#5cb25a]
+    // const { name, email, user_name, avatar_url } = user_metadata
+    // console.log(session);
 
     return (
         <div className="bg-white">
@@ -122,40 +104,12 @@ export default async function Dashboard() {
                 <FeaturesSection />
             </div>
 
-            <div className="flex h-[300px] justify-center items-center"
+            <div className="flex h-[300px] justify-center items-center mb-50"
                 style={{
                     background: "radial-gradient(circle at bottom left, #74c0db 0%, #74c0db 5%, #5cb25a 30%, #5cb25a 100%)"
                 }}
             >
                 <p className="text-white text-4xl font-bold">Your workouts tell a story—We help you read it.</p>
-            </div>
-
-
-            {/* 
-                TODO: Have a little demo chart where you can select exercises and see your bodyweight/1rm 
-                Have a few exercises preset and filled with some demo data. And have the bodyweight mimic
-                consistent lean bulk.
-                Similar to the demo on leetcode.com
-                But overall design similar to myfitnesspal.com
-            */}
-
-            <div className="flex justify-center mt-5">
-                <h2 className="text-4xl text-black text-bold">Demo</h2>
-            </div>
-
-            <div className="flex justify-center">
-                <div className="my-10 w-full max-w-4xl bg-white shadow-xl rounded-2xl p-4">
-                    <div className="w-full h-64 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-                    </div>
-                </div>
-            </div>
-            <div className="flex flex-col gap-6 my-10">
-                <div className="dashboard-section">
-                    <h2 className="text-lg font-semibold mb-1">Progress and Analysis</h2>
-                    <div className="flex flex-col lg:flex-row justify-center gap-6">
-                        <Demo />
-                    </div>
-                </div>
             </div>
 
             {/* FOOTER */}
