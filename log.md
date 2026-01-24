@@ -358,3 +358,4 @@ do it once and keep that for the rest of the session?
 So we can have like 7 circles, sun - sat, and days that you did log are filled in green or lit up,
 otherwise they are grayed out.
 * Should add graphs under each exercise in the exercises page
+* Need to fix reset password page not working??? WHYYY

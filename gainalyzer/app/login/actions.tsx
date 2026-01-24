@@ -12,22 +12,27 @@ const signInWith = (provider: Provider) => async () => {
 
     const supabase = await createClient()
 
-    const siteUrl = process.env.SITE_URL;
+    // const siteUrl = process.env.SITE_URL;
+    //
+    // if (!siteUrl) {
+    //     throw new Error("SITE_URL is not defined");
+    // }
+    //
+    // const auth_callback_url = `${siteUrl}/auth/callback`
 
-    if (!siteUrl) {
-        throw new Error("SITE_URL is not defined");
-    }
-
-    const auth_callback_url = `${siteUrl}/auth/callback`
+    const auth_callback_url = `${process.env.SITE_URL}/auth/callback`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
             redirectTo: auth_callback_url,
+            queryParams: { // forces google account chooser every time
+                prompt: 'select_account',
+            }
         },
     })
 
-    // console.log(data)
+    console.log(data)
 
     if (error) {
         console.log(error)
@@ -81,7 +86,7 @@ async function loginWithEmailPassword(formData: FormData) {
 
     revalidatePath('/', 'layout')
 
-    return { redirect: '/' }
+    return { redirect: '/dashboard' }
 
     // if (profile?.is_complete) {
     //     return { redirect: '/' }
