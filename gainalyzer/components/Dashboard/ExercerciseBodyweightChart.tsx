@@ -185,15 +185,21 @@ export default function ExerciseBodyweightChart({ logs, userExercises, units, da
 
         // 5️⃣ compute X ticks, Y axis domains, etc.
         let intervalDays = 1;
+        let totalDays = 0;
         if (dateRange === "7d") intervalDays = 1;
         else if (dateRange === "30d") intervalDays = 7;
         else if (dateRange === "90d") intervalDays = isMobile ? 14 : 7;
         else if (dateRange === "180d") intervalDays = isMobile ? 30 : 14;
         else if (dateRange === "365d") intervalDays = isMobile ? 60 : 30;
         else if (dateRange === "all") {
-            const totalDays = Math.ceil(
-                (today.getTime() - new Date(filteredLogs[0].log_date).getTime()) / (1000 * 60 * 60 * 24)
-            );
+            if (filteredLogs.length == 0) {
+                totalDays = today.getTime() - 30;
+            }
+            else {
+                totalDays = Math.ceil(
+                    (today.getTime() - new Date(filteredLogs[0].log_date).getTime()) / (1000 * 60 * 60 * 24)
+                );
+            }
             const maxTicks = isMobile ? 8 : 12;
             intervalDays = Math.ceil(totalDays / maxTicks);
         }
