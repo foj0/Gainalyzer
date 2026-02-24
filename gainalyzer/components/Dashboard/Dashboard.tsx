@@ -543,9 +543,71 @@ export default function Dashboard() {
                                             <p className="text-sm mb-2">Start: {convertFromBase(Number(bodyweightStart))} {units}</p>
                                             <p className="text-sm mb-2">Goal: {convertFromBase(Number(bodyweightGoal))} {units}</p>
                                         </div>
-                                        <ProgressBar value={(Number(quickStats?.currentBodyweight) / Number(bodyweightGoal))} label={Number(convertFromBase(Number(quickStats?.currentBodyweight))).toFixed(1)} />
-                                        <p className="text-sm mt-1 text-gray-400">{bwProgDesc}</p>
-                                        <p className="text-sm mt-1 text-gray-400">{`${(Number(bodyweightGoal) - Number(quickStats?.currentBodyweight)).toFixed(1)} ${units} to go!`}</p>
+                                        {
+                                            // want to lose weight.
+                                            // Start: 158
+                                            // Current: 159
+                                            // Goal: 155
+                                            (() => {
+                                                const start = Number(bodyweightStart);
+                                                const goal = Number(bodyweightGoal);
+                                                let current = Number(quickStats?.currentBodyweight);
+                                                let remaining = 0;
+                                                let progress = 0;
+
+                                                if (goal > start) {
+                                                    // goal is to gain weight
+
+                                                    // if current weight is less than when goal was set
+                                                    if (current < start) {
+                                                        progress = 0;
+                                                    } else {
+                                                        progress = (current - start) / (goal - start);
+                                                    }
+                                                    remaining = goal - current;
+
+                                                } else if (goal < start) {
+                                                    // goal is to lose weight
+
+                                                    // current weight is greater than when goal was set
+                                                    if (current > start) {
+                                                        progress = 0;
+                                                    } else {
+                                                        progress = (start - current) / (start - goal);
+                                                    }
+                                                    remaining = current - goal;
+
+                                                } else {
+                                                    // start equals goal
+                                                    progress = 1;
+                                                    remaining = 0;
+                                                }
+
+                                                progress = Math.min(Math.max(progress, 0), 1);
+
+
+                                                let bodyweightProgressDesc = ""
+                                                if (start - current <= 0) {
+                                                    bodyweightProgressDesc = `+${Math.abs(start - current).toFixed(1)} ${units} from starting weight`
+                                                } else {
+                                                    bodyweightProgressDesc = `-${Math.abs(current - start).toFixed(1)} ${units} from starting weight`
+                                                }
+
+                                                return (
+                                                    <>
+                                                        <ProgressBar value={progress} label={current.toFixed(1)} />
+                                                        <p className="text-sm mt-1 text-gray-400">{bodyweightProgressDesc}</p>
+                                                        {remaining <= 0 ? (
+                                                            <p className="text-sm mt-1 text-gray-400">You've reached your goal!</p>
+
+                                                        ) : (
+
+                                                            <p className="text-sm mt-1 text-gray-400">{`${Math.abs(goal - current).toFixed(1)} ${units} to go!`}</p>
+                                                        )}
+                                                    </>
+                                                )
+                                            })()
+                                        }
                                     </div>
                                 </>
                                 :
