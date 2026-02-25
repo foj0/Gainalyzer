@@ -551,7 +551,7 @@ export default function Dashboard() {
                                             (() => {
                                                 const start = Number(bodyweightStart);
                                                 const goal = Number(bodyweightGoal);
-                                                let current = Number(quickStats?.currentBodyweight);
+                                                const current = Number(quickStats?.currentBodyweight);
                                                 let remaining = 0;
                                                 let progress = 0;
 
@@ -598,7 +598,7 @@ export default function Dashboard() {
                                                         <ProgressBar value={progress} label={current.toFixed(1)} />
                                                         <p className="text-sm mt-1 text-gray-400">{bodyweightProgressDesc}</p>
                                                         {remaining <= 0 ? (
-                                                            <p className="text-sm mt-1 text-gray-400">You've reached your goal!</p>
+                                                            <p className="text-sm mt-1 text-gray-400">You&apos;ve reached your goal!</p>
 
                                                         ) : (
 
